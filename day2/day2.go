@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	input := util.InputNums(2, util.CSVParser)
+	input := util.InputInts(util.Inputs[2], util.CSVParser)
 
 	fmt.Println(part1(input))
 }
@@ -21,6 +21,6 @@ const (
 	Halt = 99
 )
 
-func part1(i [][]float64) float64 {
+func part1(i [][]int) int {
 	return i[0][0]
 }
