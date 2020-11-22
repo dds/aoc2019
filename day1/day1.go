@@ -23,6 +23,27 @@ func part1() int {
 	return int(sum)
 }
 
+func massfuel(mass float64) float64 {
+	sum := 0.0
+	for f := fuel(mass); f >= 0; f = fuel(f) {
+		sum += f
+	}
+	return sum
+}
+
+func part2() int {
+	input, err := util.InputNums(1, util.CSVParser)
+	if err != nil {
+		panic(err)
+	}
+	mass := 0.0
+	for _, l := range input {
+		mass += massfuel(l[0])
+	}
+	return int(mass)
+}
+
 func main() {
 	fmt.Println(part1())
+	fmt.Println(part2())
 }
