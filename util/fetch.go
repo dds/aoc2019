@@ -7,8 +7,8 @@ import (
 	"time"
 )
 
-const YEAR = 2020
-const start = "01 Dec 20 00:00 -0000"
+const YEAR = 2019
+const start = "01 Dec 19 00:00 -0000"
 
 // GetInput returns the puzzle input for the given day.
 func GetInput(day int, sessionCookie string) (r string, err error) {
