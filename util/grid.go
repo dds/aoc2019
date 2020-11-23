@@ -12,13 +12,13 @@ func (g *Grid) Resize(size int) *Grid {
 		return g
 	}
 	r := Grid{make([][]string, size)}
-	for i := 0; i < size; i++ {
+	for j := 0; j < size; j++ {
 		newRow := make([]string, size)
-		r.Point[i] = newRow
+		r.Point[j] = newRow
 	}
-	for i, row := range g.Point {
-		for j, x := range row {
-			r.Point[i][j] = x
+	for j, row := range g.Point {
+		for i, x := range row {
+			r.Point[j][i] = x
 		}
 	}
 	return &r
@@ -39,6 +39,23 @@ func (g Grid) String() string {
 	return r
 }
 
+// Translate returns the location with cooordinates of x and y in the grid.
+func (g Grid) Translate(x, y int) (int, int) {
+	if x > 0 {
+		x = 2 * x
+	} else {
+		x = -x
+	}
+
+	if y > 0 {
+		y = 2 * y
+	} else {
+		y = -y
+	}
+
+	return x, y
+}
+
 // AddPoint ...
 func (g Grid) AddPoint(x, y int, z string) *Grid {
 	max := x
@@ -46,7 +63,29 @@ func (g Grid) AddPoint(x, y int, z string) *Grid {
 		max = y
 	}
 	r := g.Resize(1 + max)
-	r.Point[x][y] = z
+	r.Point[y][x] = z
+	return r
+}
+
+// AddStrip ...
+func (g Grid) AddStrip(x, y, steps int, dir rune, z string) *Grid {
+	var addX, addY int
+	switch dir {
+	case 'U':
+		addY = 1
+	case 'D':
+		addY = -1
+	case 'L':
+		addX = -1
+	case 'R':
+		addX = 1
+	}
+	r := &g
+	for i := 0; i < steps; i++ {
+		r = r.AddPoint(x, y, z)
+		x += addX
+		y += addY
+	}
 	return r
 }
 

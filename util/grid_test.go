@@ -10,6 +10,6 @@ import (
 
 func TestGrid(t *testing.T) {
 	g := &util.Grid{}
-	g = g.AddPoint(1, 1, "X")
-	require.Equal(t, fmt.Sprint(g), ".X\n..\n")
+	require.Equal(t, ".x\n..\n", fmt.Sprint(g.AddPoint(1, 1, "x")))
+	require.Equal(t, "..\nxx\n", fmt.Sprint(g.AddStrip(0, 0, 2, 'R', "x")))
 }
