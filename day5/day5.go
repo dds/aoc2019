@@ -11,6 +11,7 @@ var Input = util.InputInts(util.Inputs[5], util.CSVParser)[0]
 
 func main() {
 	fmt.Println(part1(Input))
+	fmt.Println(part2(Input))
 }
 
 func part1(input []int) (r []int) {
@@ -20,4 +21,14 @@ func part1(input []int) (r []int) {
 		panic(err)
 	}
 	return
+}
+
+func part2(input []int) (r []int) {
+	var err error
+	_, r, err = intcode.Exec(input, []int{5})
+	if err != nil {
+		panic(err)
+	}
+	return
+
 }

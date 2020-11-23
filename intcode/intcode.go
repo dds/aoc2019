@@ -13,6 +13,10 @@ const (
 	Mul
 	Input
 	Output
+	JumpIfTrue
+	JumpIfFalse
+	LessThan
+	Equals
 	Halt = 99
 )
 
@@ -47,6 +51,18 @@ func Opmodes(code int) (r []Opmode) {
 	switch op := ParseOpcode(code); op {
 	default:
 		r = []Opmode{PositionMode}
+
+	// 	Opcodes that take two parameters
+	case JumpIfTrue:
+		fallthrough
+	case JumpIfFalse:
+		r = []Opmode{PositionMode, PositionMode}
+
+		// Opcodes that take three parameters
+	case LessThan:
+		fallthrough
+	case Equals:
+		fallthrough
 	case Add:
 		fallthrough
 	case Mul:
@@ -89,6 +105,7 @@ func Exec(code, in []int) (c, out []int, err error) {
 
 	var op Opcode
 	for i := c[ip]; ; i = c[ip] {
+		a := args(op, Opmodes(i))
 		switch op = ParseOpcode(i); op {
 		default:
 			err = fmt.Errorf("Unknown op: %v, ip: %v, code: %v", op, ip, c[ip])
@@ -96,26 +113,43 @@ func Exec(code, in []int) (c, out []int, err error) {
 		case Halt:
 			return
 		case Add:
-			a := args(op, Opmodes(i))
 			c[a[2]] = c[a[0]] + c[a[1]]
 			ip += 4
 		case Mul:
-			a := args(op, Opmodes(i))
 			c[a[2]] = c[a[0]] * c[a[1]]
 			ip += 4
 		case Input:
-			mode := Opmodes(i)[0]
-			if mode == PositionMode {
-				c[c[ip+1]] = in[0]
-			} else {
-				c[ip+1] = in[0]
-			}
+			c[a[0]] = in[0]
 			in = in[1:]
 			ip += 2
 		case Output:
+			fmt.Println(c[ip-10 : ip+2])
 			out = append(out, c[c[ip+1]])
 			ip += 2
+		case JumpIfTrue:
+			if c[a[0]] != 0 {
+				ip = c[a[1]]
+			}
+			ip += 2
+		case JumpIfFalse:
+			if c[a[0]] == 0 {
+				ip = c[a[1]]
+			}
+			ip += 2
+		case LessThan:
+			if c[a[0]] < c[a[1]] {
+				c[a[2]] = 1
+			} else {
+				c[a[2]] = 0
+			}
+			ip += 3
+		case Equals:
+			if c[a[0]] == c[a[1]] {
+				c[a[2]] = 1
+			} else {
+				c[a[2]] = 0
+			}
+			ip += 3
 		}
 	}
-	return
 }
