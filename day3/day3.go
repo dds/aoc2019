@@ -29,7 +29,7 @@ func ParsePos(pos string) (int, int) {
 }
 
 func Cross(path1 []string, path2 []string) int {
-	g := util.Grid{}
+	g := &util.Grid{}
 	for _, i := range path1 {
 		x, y := ParsePos(i)
 		g = g.AddPoint(x, y, "X")
