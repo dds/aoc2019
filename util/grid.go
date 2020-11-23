@@ -1,66 +1,65 @@
 package util
 
-import "sync"
+import (
+	"bytes"
+	"sync"
+)
 
-// Grid represents a NxN grid of points.
+// Grid represents an array of points.
 type Grid struct {
 	sync.RWMutex
-	Point [][]string
+	points []point
 }
 
-// Resize returns a new grid size with size of the positive X axis containing
-// all of the source grid's points.
-func (g *Grid) Resize(size int) {
-	if len(g.Point) >= size {
-		return
-	}
-	g.Lock()
-	defer g.Unlock()
-	r := make([][]string, size)
-	for j := 0; j < size; j++ {
-		newRow := make([]string, size)
-		r[j] = newRow
-	}
-	for j, row := range g.Point {
-		for i, x := range row {
-			r[j][i] = x
+// point represnts a cartesian point.
+type point struct {
+	X, Y int
+	V    string
+}
+
+// Size ...
+func (g *Grid) Size() (int, int) {
+	var minX, minY, maxX, maxY int
+	g.RLock()
+	defer g.RUnlock()
+	for _, p := range g.points {
+		if p.X < minX {
+			minX = p.X
+		}
+		if p.Y < minY {
+			minY = p.Y
+		}
+		if p.X > maxX {
+			maxX = p.X
+		}
+		if p.Y > maxY {
+			maxY = p.Y
 		}
 	}
-	g.Point = r
+	return (maxX - minX) + 1, (maxY - minY) + 1
 }
 
 // String ...
 func (g *Grid) String() string {
+	x, y := g.Size()
+	graph := [][]byte{}
+	for i := 0; i < x; i++ {
+		row := []byte{}
+		for j := 0; j < y; j++ {
+			row = append(row, '.')
+		}
+		graph = append(graph, row)
+	}
 	g.RLock()
 	defer g.RUnlock()
-	r := ""
-	for i := len(g.Point) - 1; i >= 0; i-- {
-		for _, x := range g.Point[i] {
-			if x == "" {
-				x = "."
-			}
-			r += x
-		}
-		r += "\n"
+	trans := func(p, q int) (int, int) {
+		return p + x, q + y
 	}
-	return r
-}
-
-// Translate returns Cartesian (-N,N) coordinates translated into grid coordinates [0, N).
-func (*Grid) Translate(x, y int) (int, int) {
-	if x > 0 {
-		x = 2 * x
-	} else {
-		x = -x
+	for _, p := range g.points {
+		x, y := trans(p.X, p.Y)
+		graph[x][y] = '#'
 	}
-
-	if y > 0 {
-		y = 2 * y
-	} else {
-		y = -y
-	}
-
-	return x, y
+	return string(bytes.Join(graph, []byte("\n")))
 }
 
 // Return the Cartesian point walking from (X, Y) steps in direction.
@@ -79,19 +78,14 @@ func (*Grid) Walk(x, y, steps int, dir rune) (int, int) {
 }
 
 // AddPoint ...
-func (g *Grid) AddPoint(x, y int, z string) {
-	max := x
-	if y > max {
-		max = y
-	}
-	g.Resize(1 + max)
+func (g *Grid) AddPoint(x, y int, v string) {
 	g.Lock()
 	defer g.Unlock()
-	g.Point[y][x] = z
+	g.points = append(g.points, point{X: x, Y: y, V: v})
 }
 
 // AddStrip ...
-func (g *Grid) AddStrip(x, y, steps int, dir rune, z string) {
+func (g *Grid) AddStrip(x, y, steps int, dir rune, v string) {
 	var addX, addY int
 	switch dir {
 	case 'U':
@@ -104,7 +98,7 @@ func (g *Grid) AddStrip(x, y, steps int, dir rune, z string) {
 		addX = 1
 	}
 	for i := 0; i < steps; i++ {
-		g.AddPoint(x, y, z)
+		g.AddPoint(x, y, v)
 		x += addX
 		y += addY
 	}
