@@ -42,3 +42,24 @@ func TestIO(t *testing.T) {
 		})
 	}
 }
+
+func TestOpmodes(t *testing.T) {
+	type test struct {
+		input  int
+		expect []intcode.Opmode
+	}
+
+	tests := []test{
+		test{
+			input:  1002,
+			expect: []intcode.Opmode{intcode.ImmediateMode, intcode.PositionMode},
+		},
+	}
+
+	for i, test := range tests {
+		t.Run(fmt.Sprint(i), func(t *testing.T) {
+			require.Equal(t, test.expect, intcode.Opmodes(test.input))
+		})
+	}
+
+}
