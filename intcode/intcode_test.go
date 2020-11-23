@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/dds/aoc2020/intcode"
+	"github.com/dds/aoc2020/util"
 	"github.com/stretchr/testify/require"
 )
 
@@ -52,7 +53,7 @@ func TestOpmodes(t *testing.T) {
 	tests := []test{
 		test{
 			input:  1002,
-			expect: []intcode.Opmode{intcode.ImmediateMode, intcode.PositionMode},
+			expect: []intcode.Opmode{intcode.PositionMode, intcode.ImmediateMode, intcode.PositionMode},
 		},
 	}
 
@@ -62,4 +63,58 @@ func TestOpmodes(t *testing.T) {
 		})
 	}
 
+}
+
+func TestOps(t *testing.T) {
+	type test struct {
+		input  []int
+		expect []int
+	}
+	tests := []test{
+		test{
+			input: util.InputInts("1,9,10,3,2,3,11,0,99,30,40,50", util.CSVParser)[0],
+			expect: []int{
+				3500, 9, 10, 70,
+				2, 3, 11, 0,
+				99,
+				30, 40, 50,
+			},
+		},
+		test{
+			input: util.InputInts("1,0,0,0,99", util.CSVParser)[0],
+			expect: []int{
+				2, 0, 0, 0, 99,
+			},
+		},
+		test{
+			input: util.InputInts("2,3,0,3,99", util.CSVParser)[0],
+			expect: []int{
+				2, 3, 0, 6, 99,
+			},
+		},
+		test{
+			input: util.InputInts("2,4,4,5,99,0", util.CSVParser)[0],
+			expect: []int{
+				2, 4, 4, 5, 99, 9801,
+			},
+		},
+		test{
+			input: util.InputInts("1,1,1,4,99,5,6,0,99", util.CSVParser)[0],
+			expect: []int{
+				30, 1, 1, 4, 2, 5, 6, 0, 99,
+			},
+		},
+		test{
+			input: util.InputInts("1002,4,3,4,33", util.CSVParser)[0],
+			expect: []int{
+				1002, 4, 3, 4, 99,
+			},
+		},
+	}
+
+	for _, test := range tests {
+		r, _, err := intcode.Exec(test.input, []int{})
+		require.NoError(t, err)
+		require.Equal(t, test.expect, r)
+	}
 }
