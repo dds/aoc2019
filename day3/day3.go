@@ -15,7 +15,7 @@ func Parse(pos string) (rune, int) {
 	if err != nil {
 		panic(err)
 	}
-	return dir, steps
+	return rune(dir), steps
 }
 
 func Cross(path1 []string, path2 []string) int {
@@ -23,8 +23,13 @@ func Cross(path1 []string, path2 []string) int {
 	var x, y int
 	for _, i := range path1 {
 		dir, steps := Parse(i)
-		x, y = g.Translate(g.Walk(x, y, dir, steps))
-		g = g.AddStrip(x, y, dir, steps, "X")
+		x, y = g.Translate(g.Walk(x, y, steps, dir))
+		g = g.AddStrip(x, y, steps, dir, "-")
+	}
+	for _, i := range path2 {
+		dir, steps := Parse(i)
+		x, y = g.Translate(g.Walk(x, y, steps, dir))
+		g = g.AddStrip(x, y, steps, dir, "-")
 	}
 	fmt.Println(g)
 	return 0
