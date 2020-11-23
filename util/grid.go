@@ -1,31 +1,38 @@
 package util
 
+import "sync"
+
 // Grid represents a NxN grid of points.
 type Grid struct {
+	sync.RWMutex
 	Point [][]string
 }
 
 // Resize returns a new grid size with size of the positive X axis containing
 // all of the source grid's points.
-func (g *Grid) Resize(size int) *Grid {
+func (g *Grid) Resize(size int) {
 	if len(g.Point) >= size {
-		return g
+		return
 	}
-	r := Grid{make([][]string, size)}
+	g.Lock()
+	defer g.Unlock()
+	r := make([][]string, size)
 	for j := 0; j < size; j++ {
 		newRow := make([]string, size)
-		r.Point[j] = newRow
+		r[j] = newRow
 	}
 	for j, row := range g.Point {
 		for i, x := range row {
-			r.Point[j][i] = x
+			r[j][i] = x
 		}
 	}
-	return &r
+	g.Point = r
 }
 
 // String ...
-func (g Grid) String() string {
+func (g *Grid) String() string {
+	g.RLock()
+	defer g.RUnlock()
 	r := ""
 	for i := len(g.Point) - 1; i >= 0; i-- {
 		for _, x := range g.Point[i] {
@@ -40,7 +47,7 @@ func (g Grid) String() string {
 }
 
 // Translate returns Cartesian (-N,N) coordinates translated into grid coordinates [0, N).
-func (g Grid) Translate(x, y int) (int, int) {
+func (*Grid) Translate(x, y int) (int, int) {
 	if x > 0 {
 		x = 2 * x
 	} else {
@@ -57,7 +64,7 @@ func (g Grid) Translate(x, y int) (int, int) {
 }
 
 // Return the Cartesian point walking from (X, Y) steps in direction.
-func (g Grid) Walk(x, y, steps int, dir rune) (int, int) {
+func (*Grid) Walk(x, y, steps int, dir rune) (int, int) {
 	switch dir {
 	case 'U':
 		return x, y + steps
@@ -72,18 +79,19 @@ func (g Grid) Walk(x, y, steps int, dir rune) (int, int) {
 }
 
 // AddPoint ...
-func (g Grid) AddPoint(x, y int, z string) *Grid {
+func (g *Grid) AddPoint(x, y int, z string) {
 	max := x
 	if y > max {
 		max = y
 	}
-	r := g.Resize(1 + max)
-	r.Point[y][x] = z
-	return r
+	g.Resize(1 + max)
+	g.Lock()
+	defer g.Unlock()
+	g.Point[y][x] = z
 }
 
 // AddStrip ...
-func (g Grid) AddStrip(x, y, steps int, dir rune, z string) *Grid {
+func (g *Grid) AddStrip(x, y, steps int, dir rune, z string) {
 	var addX, addY int
 	switch dir {
 	case 'U':
@@ -95,17 +103,15 @@ func (g Grid) AddStrip(x, y, steps int, dir rune, z string) *Grid {
 	case 'R':
 		addX = 1
 	}
-	r := &g
 	for i := 0; i < steps; i++ {
-		r = r.AddPoint(x, y, z)
+		g.AddPoint(x, y, z)
 		x += addX
 		y += addY
 	}
-	return r
 }
 
 // Distance returns the taxicab distance between two points.
-func Distance(x1, y1, x2, y2 int) int {
+func (*Grid) Distance(x1, y1, x2, y2 int) int {
 	var p1, p2 int
 	if x2 > x1 {
 		p1 = x2 - x1
