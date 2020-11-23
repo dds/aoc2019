@@ -12,8 +12,8 @@ func main() {
 	fmt.Println(part1(Input))
 }
 
-func part1(input []int) {
-
+func part1(input []int) (r string) {
+	return
 }
 
 type Opcode int
