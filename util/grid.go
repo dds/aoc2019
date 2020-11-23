@@ -68,6 +68,7 @@ func (g Grid) Walk(x, y, steps int, dir rune) (int, int) {
 	case 'R':
 		return x + steps, y
 	}
+	return x, y
 }
 
 // AddPoint ...
