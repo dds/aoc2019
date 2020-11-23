@@ -9,7 +9,31 @@ import (
 )
 
 func TestGrid(t *testing.T) {
-	g := &util.Grid{}
-	require.Equal(t, ".x\n..\n", fmt.Sprint(g.AddPoint(1, 1, "x")))
-	require.Equal(t, "..\nxx\n", fmt.Sprint(g.AddStrip(0, 0, 2, 'R', "x")))
+	type test struct {
+		input  func() *util.Grid
+		expect string
+	}
+	tests := []test{
+		test{
+			input: func() *util.Grid {
+				g := &util.Grid{}
+				g.AddPoint(1, 1, "x")
+				return g
+			},
+			expect: ".x\n..\n",
+		},
+		test{
+			input: func() *util.Grid {
+				g := &util.Grid{}
+				g.AddStrip(0, 0, 2, 'R', "x")
+				return g
+			},
+			expect: "..\nxx\n",
+		},
+	}
+	for i, test := range tests {
+		t.Run(fmt.Sprint(i), func(t *testing.T) {
+			require.Equal(t, test.expect, fmt.Sprint(test.input()))
+		})
+	}
 }
