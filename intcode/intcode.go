@@ -51,6 +51,8 @@ func Opmodes(code int) (r []Opmode) {
 	switch op := ParseOpcode(code); op {
 	default:
 		r = []Opmode{PositionMode}
+	case Halt:
+		r = []Opmode{}
 
 	// 	Opcodes that take two parameters
 	case JumpIfTrue:
@@ -67,6 +69,9 @@ func Opmodes(code int) (r []Opmode) {
 		fallthrough
 	case Mul:
 		r = []Opmode{PositionMode, PositionMode, PositionMode}
+	}
+	if len(s) < 3 {
+		return
 	}
 	var j int
 	for i := n - 3; i >= 0; i-- {
@@ -86,18 +91,13 @@ func Exec(code, in []int) (c, out []int, err error) {
 
 	args := func(op Opcode, modes []Opmode) (r []int) {
 		for i, o := range modes {
-			// "Parameters that an instruction writes to will never be in immediate mode."
-			if i == 2 && (op == Add || op == Mul) {
-				r = append(r, c[ip+3])
-				return
-			}
 			switch o {
 			case PositionMode:
-				// Return the value at position ip+i+1
-				r = append(r, c[ip+i+1])
+				// Dereference at position ip+i+1
+				r = append(r, c[c[ip+i+1]])
 			case ImmediateMode:
-				// Return ip+i+1
-				r = append(r, ip+i+1)
+				// Return the value at ip+i+1
+				r = append(r, c[ip+i+1])
 			}
 		}
 		return
@@ -105,7 +105,6 @@ func Exec(code, in []int) (c, out []int, err error) {
 
 	var op Opcode
 	for i := c[ip]; ; i = c[ip] {
-		a := args(op, Opmodes(i))
 		switch op = ParseOpcode(i); op {
 		default:
 			err = fmt.Errorf("Unknown op: %v, ip: %v, code: %v", op, ip, c[ip])
@@ -113,43 +112,56 @@ func Exec(code, in []int) (c, out []int, err error) {
 		case Halt:
 			return
 		case Add:
-			c[a[2]] = c[a[0]] + c[a[1]]
+			a := args(op, Opmodes(i))
+			c[c[ip+3]] = a[0] + a[1]
 			ip += 4
 		case Mul:
-			c[a[2]] = c[a[0]] * c[a[1]]
+			a := args(op, Opmodes(i))
+			c[c[ip+3]] = a[0] * a[1]
 			ip += 4
 		case Input:
-			c[a[0]] = in[0]
+			c[c[ip+1]] = in[0]
 			in = in[1:]
 			ip += 2
 		case Output:
-			fmt.Println(c[ip-10 : ip+2])
-			out = append(out, c[c[ip+1]])
+			// if Opmodes(i)[0] == ImmediateMode {
+			// 	fmt.Println("WTF", Opmodes(i))
+			// }
+			// fmt.Println(c[ip-10 : ip+2])
+			// fmt.Println(code[ip-10 : ip+2])
+			a := args(op, Opmodes(i))
+			out = append(out, a[0])
 			ip += 2
 		case JumpIfTrue:
-			if c[a[0]] != 0 {
-				ip = c[a[1]]
+			a := args(op, Opmodes(i))
+			if a[0] != 0 {
+				ip = a[1]
+			} else {
+				ip += 3
 			}
-			ip += 2
 		case JumpIfFalse:
-			if c[a[0]] == 0 {
-				ip = c[a[1]]
+			a := args(op, Opmodes(i))
+			if a[0] == 0 {
+				ip = a[1]
+			} else {
+				ip += 3
 			}
-			ip += 2
 		case LessThan:
-			if c[a[0]] < c[a[1]] {
-				c[a[2]] = 1
+			a := args(op, Opmodes(i))
+			if a[0] < a[1] {
+				c[c[ip+3]] = 1
 			} else {
-				c[a[2]] = 0
+				c[c[ip+3]] = 0
 			}
-			ip += 3
+			ip += 4
 		case Equals:
-			if c[a[0]] == c[a[1]] {
-				c[a[2]] = 1
+			a := args(op, Opmodes(i))
+			if a[0] == a[1] {
+				c[c[ip+3]] = 1
 			} else {
-				c[a[2]] = 0
+				c[c[ip+3]] = 0
 			}
-			ip += 3
+			ip += 4
 		}
 	}
 }
