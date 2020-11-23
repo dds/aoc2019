@@ -1,32 +1,51 @@
 package util
 
-import (
-	"github.com/pkg/math"
-)
-
 // Grid represents a NxN grid of points.
 type Grid struct {
 	Point [][]string
 }
 
-// Resize returns a new grid of size N containing all of the existing grids
-// points.
-func (g Grid) Resize(size int) Grid {
+// Resize returns a new grid size with size of the positive X axis containing
+// all of the source grid's points.
+func (g *Grid) Resize(size int) *Grid {
 	if len(g.Point) >= size {
 		return g
 	}
 	r := Grid{make([][]string, size)}
-	for i, row := range g.Point {
+	for i := 0; i < size; i++ {
 		newRow := make([]string, size)
-		copy(newRow, row)
 		r.Point[i] = newRow
+	}
+	for i, row := range g.Point {
+		for j, x := range row {
+			r.Point[i][j] = x
+		}
+	}
+	return &r
+}
+
+// String ...
+func (g Grid) String() string {
+	r := ""
+	for i := len(g.Point) - 1; i >= 0; i-- {
+		for _, x := range g.Point[i] {
+			if x == "" {
+				x = "."
+			}
+			r += x
+		}
+		r += "\n"
 	}
 	return r
 }
 
 // AddPoint ...
-func (g Grid) AddPoint(x, y int, z string) Grid {
-	r := g.Resize(1 + math.MaxInt(x, y))
+func (g Grid) AddPoint(x, y int, z string) *Grid {
+	max := x
+	if y > max {
+		max = y
+	}
+	r := g.Resize(1 + max)
 	r.Point[x][y] = z
 	return r
 }
