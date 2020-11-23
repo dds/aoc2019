@@ -39,8 +39,8 @@ func (g Grid) String() string {
 	return r
 }
 
-// Translate returns the location with cooordinates of x and y in the grid.
-func (g Grid) Translate(x, y int) (int, int) {
+// Translate returns Cartesian (-N,N) coordinates translated into grid coordinates [0, N).
+func Translate(x, y int) (int, int) {
 	if x > 0 {
 		x = 2 * x
 	} else {
@@ -54,6 +54,20 @@ func (g Grid) Translate(x, y int) (int, int) {
 	}
 
 	return x, y
+}
+
+// Return the Cartesian point walking from (X, Y) steps in direction.
+func Walk(x, y, steps int, dir rune) (int, int) {
+	switch dir {
+	case 'U':
+		return x, y + steps
+	case 'D':
+		return x, y - steps
+	case 'L':
+		return x - steps, y
+	case 'R':
+		return x + steps, y
+	}
 }
 
 // AddPoint ...
