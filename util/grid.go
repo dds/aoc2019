@@ -12,7 +12,7 @@ type Grid struct {
 // Resize returns a new grid of size N containing all of the existing grids
 // points.
 func (g Grid) Resize(size int) Grid {
-	if size <= len(g.Point) {
+	if len(g.Point) > size {
 		return g
 	}
 	r := Grid{make([][]string, size)}
@@ -26,10 +26,7 @@ func (g Grid) Resize(size int) Grid {
 
 // AddPoint ...
 func (g Grid) AddPoint(x, y int, z string) Grid {
-	var r Grid
-	if x > len(g.Point) || y > len(g.Point) {
-		r = g.Resize(math.MaxInt(x, y))
-	}
+	r := g.Resize(math.MaxInt(x+1, y+1))
 	r.Point[x][y] = z
 	return r
 }
