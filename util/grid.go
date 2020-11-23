@@ -40,7 +40,7 @@ func (g Grid) String() string {
 }
 
 // Translate returns Cartesian (-N,N) coordinates translated into grid coordinates [0, N).
-func Translate(x, y int) (int, int) {
+func (g Grid) Translate(x, y int) (int, int) {
 	if x > 0 {
 		x = 2 * x
 	} else {
@@ -57,7 +57,7 @@ func Translate(x, y int) (int, int) {
 }
 
 // Return the Cartesian point walking from (X, Y) steps in direction.
-func Walk(x, y, steps int, dir rune) (int, int) {
+func (g Grid) Walk(x, y, steps int, dir rune) (int, int) {
 	switch dir {
 	case 'U':
 		return x, y + steps
