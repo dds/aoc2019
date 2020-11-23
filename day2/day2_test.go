@@ -49,6 +49,8 @@ func TestOps(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		require.Equal(t, test.expect, Exec(test.input))
+		r, err := Exec(test.input)
+		require.NoError(t, err)
+		require.Equal(t, test.expect, r)
 	}
 }
