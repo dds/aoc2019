@@ -84,16 +84,14 @@ func password2(input int) bool {
 	if dec {
 		return false
 	}
-	var adj bool
 	for i := 0; i < 5; i++ {
-		if s[i] == s[i+1] {
-			adj = true
-		}
-		if i < 4 && s[i+2] == s[i] {
-			adj = false
-		} else if i > 1 && s[i-1] == s[i] {
-			adj = false
+		if i < 4 && s[i] == s[i+1] && s[i] == s[i+2] {
+			continue
+		} else if i > 0 && s[i-1] == s[i] && s[i] == s[i+1] {
+			continue
+		} else if s[i] == s[i+1] {
+			return true
 		}
 	}
-	return adj
+	return false
 }
