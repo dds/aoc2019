@@ -9,30 +9,22 @@ import (
 
 var Input = util.ParseInput(util.Inputs[3], util.CSVParser)[0]
 
-func ParsePos(pos string) (int, int) {
+func Parse(pos string) (rune, int) {
 	dir := pos[0]
 	steps, err := strconv.Atoi(pos[1:])
 	if err != nil {
 		panic(err)
 	}
-	switch dir {
-	case 'U':
-		return 0, steps
-	case 'D':
-		return 0, -steps
-	case 'L':
-		return -steps, 0
-	case 'R':
-		return steps, 0
-	}
-	return 0, 0
+	return dir, steps
 }
 
 func Cross(path1 []string, path2 []string) int {
 	g := &util.Grid{}
+	var x, y int
 	for _, i := range path1 {
-		x, y := ParsePos(i)
-		g = g.AddPoint(x, y, "X")
+		dir, steps := Parse(i)
+		x, y = g.Translate(g.Walk(x, y, dir, steps))
+		g = g.AddStrip(x, y, dir, steps, "X")
 	}
 	fmt.Println(g)
 	return 0
