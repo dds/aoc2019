@@ -9,6 +9,8 @@ import (
 
 var Input = strings.TrimSpace(util.Inputs[8])
 
+// var Input = `0222112222120000`
+
 func main() {
 	fmt.Println(part1(Input))
 	fmt.Println(part2(Input))
@@ -42,7 +44,7 @@ func part1(input string) (r string) {
 	fmt.Println(minZeroIdx, "minZeroIdx")
 
 	var ones, twos int
-	for i := 0; i < 150; i++ {
+	for i := 0; i < w*h; i++ {
 		switch s := string(m[minZeroIdx][i]); s {
 		case "1":
 			ones++
@@ -60,21 +62,28 @@ const (
 	tr = '2'
 )
 
-func color(pixels []byte) byte {
-	hasWhite := false
-	for _, s := range pixels {
-		switch s {
-		case bl:
-			return bl
-		case wh:
-			hasWhite := true
-		case tr:
-			continue
+func part2(input string) (r string) {
+	image := make([]byte, w*h)
+
+	for i := 0; i < len(input); i += w * h {
+		for j := 0; j < w*h; j++ {
+			if image[j] != 0 {
+				continue
+			}
+			if input[i+j] == tr {
+				continue
+			}
+			switch input[i+j] {
+			case bl:
+				image[j] = ' '
+			case wh:
+				image[j] = '#'
+			}
 		}
 	}
-	return hasWhite
-}
 
-func part2(input string) (r string) {
-	m := map[int]string{}
+	for i := 0; i < h; i++ {
+		fmt.Println(string(image[i*w : i*w+w]))
+	}
+	return
 }
