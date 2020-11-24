@@ -11,6 +11,7 @@ var Input = strings.TrimSpace(util.Inputs[8])
 
 func main() {
 	fmt.Println(part1(Input))
+	fmt.Println(part2(Input))
 }
 
 const (
@@ -51,4 +52,29 @@ func part1(input string) (r string) {
 	}
 	r = fmt.Sprint(ones * twos)
 	return
+}
+
+const (
+	bl = '0'
+	wh = '1'
+	tr = '2'
+)
+
+func color(pixels []byte) byte {
+	hasWhite := false
+	for _, s := range pixels {
+		switch s {
+		case bl:
+			return bl
+		case wh:
+			hasWhite := true
+		case tr:
+			continue
+		}
+	}
+	return hasWhite
+}
+
+func part2(input string) (r string) {
+	m := map[int]string{}
 }
