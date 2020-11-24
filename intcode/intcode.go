@@ -20,6 +20,7 @@ const (
 	JumpIfFalse
 	LessThan
 	Equals
+	SetBase
 	Halt = 99
 )
 
@@ -45,6 +46,7 @@ func ParseVerb(c int) Verb {
 const (
 	PositionMode  Opmode = 0
 	ImmediateMode Opmode = 1
+	RelativeMode  Opmode = 2
 )
 
 // Returns the parameter modes of an instruction.
@@ -78,8 +80,11 @@ func Opmodes(code int) (r []Opmode) {
 	}
 	var j int
 	for i := n - 3; i >= 0; i-- {
-		if s[i] == '1' {
+		switch s[i] {
+		case '1':
 			r[j] = ImmediateMode
+		case '2':
+			r[j] = RelativeMode
 		}
 		j++
 	}
@@ -90,17 +95,28 @@ func Opmodes(code int) (r []Opmode) {
 func (c Code) Exec(ctx context.Context, in <-chan int, out chan<- int) (err error) {
 	defer close(out)
 	ip := 0
+	base := 0
 	count := 0
 	args := func(op Verb, modes []Opmode) (r []int) {
 		for i, o := range modes {
+			var addr int
 			switch o {
 			case PositionMode:
 				// Dereference at position ip+i+1
-				r = append(r, c[c[ip+i+1]])
+				addr = c[ip+i+1]
 			case ImmediateMode:
 				// Return the value at ip+i+1
-				r = append(r, c[ip+i+1])
+				addr = ip + i + 1
+			case RelativeMode:
+				// Dereference at position base+ip+i+1
+				addr = base + c[ip+i+1]
 			}
+			if addr >= len(c) {
+				cc := make([]int, addr+1)
+				copy(cc, c)
+				c = cc
+			}
+			r = append(r, c[addr])
 		}
 		return
 	}
@@ -171,6 +187,10 @@ func (c Code) Exec(ctx context.Context, in <-chan int, out chan<- int) (err erro
 				c[c[ip+3]] = 0
 			}
 			ip += 4
+		case SetBase:
+			a := args(op, Opmodes(i))
+			base += a[0]
+			ip += 2
 		}
 	}
 }
