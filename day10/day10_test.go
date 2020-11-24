@@ -7,21 +7,48 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func Test(t *testing.T) {
+func TestPart1(t *testing.T) {
 	type test struct {
-		input  int
-		expect int
+		input string
+		score int
+		point point
 	}
 
 	tests := []test{
 		test{
+			input: `.#..#
+.....
+#####
+....#
+...##
+`,
+			score: 8,
+			point: point{3, 4},
+			// ...
+		},
+		test{
+			input: `......#.#.
+#..#.#....
+..#######.
+.#.#.###..
+.#..#.....
+..#....#.#
+#..#....#.
+.##.#..###
+##...#..#.
+.#....####
+`,
+			score: 33,
+			point: point{5, 8},
 			// ...
 		},
 	}
 
 	for i, test := range tests {
 		t.Run(fmt.Sprint(i), func(t *testing.T) {
-			require.Equal(t, test.expect, test.input)
+			score, p := part1(test.input)
+			require.Equal(t, test.point, p)
+			require.Equal(t, test.score, score)
 		})
 	}
 }
