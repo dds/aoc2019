@@ -29,5 +29,13 @@ func part1(ctx context.Context, input []int) (r interface{}) {
 }
 
 func part2(ctx context.Context, input []int) (r interface{}) {
-	return input
+	out := make(chan int)
+	in := make(chan int)
+	go intcode.Code(input).Exec(ctx, in, out)
+	in <- 2
+	s := []int{}
+	for i := range out {
+		s = append(s, i)
+	}
+	return fmt.Sprint(s)
 }
