@@ -59,6 +59,10 @@ func Opmodes(code int) (r []Opmode) {
 	case Halt:
 		r = []Opmode{}
 
+	// Verbs of a single parameter.
+	case SetBase:
+		r = []Opmode{PositionMode}
+
 	// 	Verbs that take two parameters
 	case JumpIfTrue:
 		fallthrough
@@ -81,6 +85,8 @@ func Opmodes(code int) (r []Opmode) {
 	var j int
 	for i := n - 3; i >= 0; i-- {
 		switch s[i] {
+		case '0':
+			r[j] = PositionMode
 		case '1':
 			r[j] = ImmediateMode
 		case '2':
@@ -92,11 +98,21 @@ func Opmodes(code int) (r []Opmode) {
 }
 
 // Exec ...
-func (c Code) Exec(ctx context.Context, in <-chan int, out chan<- int) (err error) {
+func (code Code) Exec(ctx context.Context, in <-chan int, out chan<- int) (err error) {
 	defer close(out)
 	ip := 0
 	base := 0
 	count := 0
+	c := make([]int, len(code))
+	copy(c, code)
+	page := func(addr int) {
+		if addr < len(c) {
+			return
+		}
+		cc := make([]int, addr+1)
+		copy(cc, c)
+		c = cc
+	}
 	args := func(op Verb, modes []Opmode) (r []int) {
 		for i, o := range modes {
 			var addr int
@@ -109,14 +125,14 @@ func (c Code) Exec(ctx context.Context, in <-chan int, out chan<- int) (err erro
 				addr = ip + i + 1
 			case RelativeMode:
 				// Dereference at position base+ip+i+1
+				// fmt.Println("base", base, "c[ip+i+1]", c[ip+i+1])
 				addr = base + c[ip+i+1]
 			}
-			if addr >= len(c) {
-				cc := make([]int, addr+1)
-				copy(cc, c)
-				c = cc
+			if addr < 0 {
+				panic(fmt.Errorf("invalid memory address: %v", addr))
 			}
-			r = append(r, c[addr])
+			page(addr)
+			r = append(r, addr)
 		}
 		return
 	}
@@ -132,13 +148,14 @@ func (c Code) Exec(ctx context.Context, in <-chan int, out chan<- int) (err erro
 			return
 		case Add:
 			a := args(op, Opmodes(i))
-			c[c[ip+3]] = a[0] + a[1]
+			c[a[2]] = c[a[0]] + c[a[1]]
 			ip += 4
 		case Mul:
 			a := args(op, Opmodes(i))
-			c[c[ip+3]] = a[0] * a[1]
+			c[a[2]] = c[a[0]] * c[a[1]]
 			ip += 4
 		case Input:
+			a := args(op, Opmodes(i))
 			select {
 			case <-ctx.Done():
 				return ctx.Err()
@@ -146,50 +163,62 @@ func (c Code) Exec(ctx context.Context, in <-chan int, out chan<- int) (err erro
 				if !ok {
 					return
 				}
-				c[c[ip+1]] = u
+				// if Opmodes(i)[0] == RelativeMode {
+				// 	fmt.Println(c[:ip], "-->", c[ip:])
+				// 	fmt.Println("INPUT a[0]", a[0], "base", base, "base+c[ip+1]", base+c[ip+1])
+				// }
+				c[a[0]] = u
 				ip += 2
+				// if Opmodes(i)[0] == RelativeMode {
+				// 	fmt.Println(c[:ip], "-->", c[ip:])
+				// }
 			}
 		case Output:
 			a := args(op, Opmodes(i))
 			select {
 			case <-ctx.Done():
 				return ctx.Err()
-			case out <- a[0]:
+			case out <- c[a[0]]:
 			}
 			ip += 2
 		case JumpIfTrue:
 			a := args(op, Opmodes(i))
-			if a[0] != 0 {
-				ip = a[1]
+			if c[a[0]] != 0 {
+				ip = c[a[1]]
 			} else {
 				ip += 3
 			}
 		case JumpIfFalse:
 			a := args(op, Opmodes(i))
-			if a[0] == 0 {
-				ip = a[1]
+			if c[a[0]] == 0 {
+				ip = c[a[1]]
 			} else {
 				ip += 3
 			}
 		case LessThan:
 			a := args(op, Opmodes(i))
-			if a[0] < a[1] {
-				c[c[ip+3]] = 1
+			if c[a[0]] < c[a[1]] {
+				c[a[2]] = 1
 			} else {
-				c[c[ip+3]] = 0
+				c[a[2]] = 0
 			}
 			ip += 4
 		case Equals:
 			a := args(op, Opmodes(i))
-			if a[0] == a[1] {
-				c[c[ip+3]] = 1
+			if c[a[0]] == c[a[1]] {
+				c[a[2]] = 1
 			} else {
-				c[c[ip+3]] = 0
+				c[a[2]] = 0
 			}
 			ip += 4
 		case SetBase:
 			a := args(op, Opmodes(i))
-			base += a[0]
+			// if Opmodes(i)[0] == RelativeMode {
+			// 	fmt.Println("SETBASE a[0]", a[0], "base", base, "c[a[0]]", c[a[0]], "new base", base+c[a[0]])
+			// }
+			base += c[a[0]]
+			// fmt.Println("base", base, "len(c)", len(c), "a", a, "ip", ip)
+			// fmt.Println("c", c)
 			ip += 2
 		}
 	}

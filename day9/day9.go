@@ -18,7 +18,9 @@ func main() {
 
 func part1(ctx context.Context, input []int) (r interface{}) {
 	out := make(chan int)
-	go intcode.Code(input).Exec(ctx, nil, out)
+	in := make(chan int)
+	go intcode.Code(input).Exec(ctx, in, out)
+	in <- 1
 	s := []int{}
 	for i := range out {
 		s = append(s, i)

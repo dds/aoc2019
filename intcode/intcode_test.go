@@ -101,19 +101,26 @@ func TestIO(t *testing.T) {
 			},
 			expect: []int{109, 1, 204, -1, 1001, 100, 1, 100, 1008, 100, 16, 101, 1006, 101, 0, 99},
 		},
-		"big int": test{
+		"produce big int": test{
 			input: input{
 				code: []int{1102, 34915192, 34915192, 7, 4, 7, 99, 0},
 				in:   []int{},
 			},
 			expect: []int{1219070632396864},
 		},
-		"relative addresses": test{
+		"parse big int": test{
 			input: input{
 				code: []int{104, 1125899906842624, 99},
 				in:   []int{},
 			},
 			expect: []int{1125899906842624},
+		},
+		"relative base": test{
+			input: input{
+				code: []int{109, 1, 209, 0, 204, -1, 1001, 100, 1, 100, 1008, 100, 16, 101, 1006, 101, 0, 99},
+				in:   []int{},
+			},
+			expect: []int{109, 1, 204, -1, 1001, 100, 1, 100, 1008, 100, 16, 101, 1006, 101, 0, 99},
 		},
 	}
 
