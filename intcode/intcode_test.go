@@ -106,7 +106,8 @@ func TestIO(t *testing.T) {
 			errs := make(chan error)
 
 			go func() {
-				errs <- intcode.Exec(ctx, test.input.code, in, out)
+				c := intcode.Code(test.input.code)
+				errs <- c.Exec(ctx, in, out)
 			}()
 
 			go func() {

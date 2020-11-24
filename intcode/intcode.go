@@ -6,10 +6,12 @@ import (
 	"strconv"
 )
 
-type Opcode int
+type Code []int
+
+type Verb int
 
 const (
-	Unknown Opcode = iota
+	Unknown Verb = iota
 	Add
 	Mul
 	Input
@@ -23,7 +25,7 @@ const (
 
 type Opmode int
 
-func ParseOpcode(c int) Opcode {
+func ParseVerb(c int) Verb {
 	s := fmt.Sprint(c)
 	var (
 		i   int
@@ -37,7 +39,7 @@ func ParseOpcode(c int) Opcode {
 	if err != nil {
 		return Unknown
 	}
-	return Opcode(i)
+	return Verb(i)
 }
 
 const (
@@ -49,19 +51,19 @@ const (
 func Opmodes(code int) (r []Opmode) {
 	s := fmt.Sprint(code)
 	n := len(s)
-	switch op := ParseOpcode(code); op {
+	switch op := ParseVerb(code); op {
 	default:
 		r = []Opmode{PositionMode}
 	case Halt:
 		r = []Opmode{}
 
-	// 	Opcodes that take two parameters
+	// 	Verbs that take two parameters
 	case JumpIfTrue:
 		fallthrough
 	case JumpIfFalse:
 		r = []Opmode{PositionMode, PositionMode}
 
-		// Opcodes that take three parameters
+		// Verbs that take three parameters
 	case LessThan:
 		fallthrough
 	case Equals:
@@ -85,13 +87,11 @@ func Opmodes(code int) (r []Opmode) {
 }
 
 // Exec ...
-func Exec(ctx context.Context, code []int, in <-chan int, out chan<- int) (err error) {
+func (c Code) Exec(ctx context.Context, in <-chan int, out chan<- int) (err error) {
 	defer close(out)
-	c := make([]int, len(code))
-	copy(c, code)
 	ip := 0
-
-	args := func(op Opcode, modes []Opmode) (r []int) {
+	count := 0
+	args := func(op Verb, modes []Opmode) (r []int) {
 		for i, o := range modes {
 			switch o {
 			case PositionMode:
@@ -105,9 +105,10 @@ func Exec(ctx context.Context, code []int, in <-chan int, out chan<- int) (err e
 		return
 	}
 
-	var op Opcode
+	var op Verb
 	for i := c[ip]; ; i = c[ip] {
-		switch op = ParseOpcode(i); op {
+		count++
+		switch op = ParseVerb(i); op {
 		default:
 			err = fmt.Errorf("Unknown op: %v, ip: %v, code: %v", op, ip, c[ip])
 			return
@@ -124,24 +125,19 @@ func Exec(ctx context.Context, code []int, in <-chan int, out chan<- int) (err e
 		case Input:
 			select {
 			case <-ctx.Done():
-				return
-			case in, ok := <-in:
+				return ctx.Err()
+			case u, ok := <-in:
 				if !ok {
 					return
 				}
-				c[c[ip+1]] = in
+				c[c[ip+1]] = u
 				ip += 2
 			}
 		case Output:
-			// if Opmodes(i)[0] == ImmediateMode {
-			// 	fmt.Println("WTF", Opmodes(i))
-			// }
-			// fmt.Println(c[ip-10 : ip+2])
-			// fmt.Println(code[ip-10 : ip+2])
 			a := args(op, Opmodes(i))
 			select {
 			case <-ctx.Done():
-				return
+				return ctx.Err()
 			case out <- a[0]:
 			}
 			ip += 2
