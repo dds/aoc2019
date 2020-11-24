@@ -1,6 +1,7 @@
 package intcode
 
 import (
+	"context"
 	"fmt"
 	"strconv"
 )
@@ -84,8 +85,9 @@ func Opmodes(code int) (r []Opmode) {
 }
 
 // Exec ...
-func Exec(code, in []int) (c, out []int, err error) {
-	c = make([]int, len(code))
+func Exec(ctx context.Context, code []int, in <-chan int, out chan<- int) (err error) {
+	defer close(out)
+	c := make([]int, len(code))
 	copy(c, code)
 	ip := 0
 
@@ -120,9 +122,16 @@ func Exec(code, in []int) (c, out []int, err error) {
 			c[c[ip+3]] = a[0] * a[1]
 			ip += 4
 		case Input:
-			c[c[ip+1]] = in[0]
-			in = in[1:]
-			ip += 2
+			select {
+			case <-ctx.Done():
+				return
+			case in, ok := <-in:
+				if !ok {
+					return
+				}
+				c[c[ip+1]] = in
+				ip += 2
+			}
 		case Output:
 			// if Opmodes(i)[0] == ImmediateMode {
 			// 	fmt.Println("WTF", Opmodes(i))
@@ -130,7 +139,11 @@ func Exec(code, in []int) (c, out []int, err error) {
 			// fmt.Println(c[ip-10 : ip+2])
 			// fmt.Println(code[ip-10 : ip+2])
 			a := args(op, Opmodes(i))
-			out = append(out, a[0])
+			select {
+			case <-ctx.Done():
+				return
+			case out <- a[0]:
+			}
 			ip += 2
 		case JumpIfTrue:
 			a := args(op, Opmodes(i))
