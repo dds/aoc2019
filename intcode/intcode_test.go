@@ -117,7 +117,7 @@ func TestIO(t *testing.T) {
 		},
 	}
 
-	for i, test := range tests {
+	for i, ts := range tests {
 		t.Run(fmt.Sprint(i), func(t *testing.T) {
 			ctx, cancel := context.WithDeadline(context.TODO(), time.Now().Add(2*time.Second))
 			defer cancel()
@@ -126,16 +126,16 @@ func TestIO(t *testing.T) {
 			out := make(chan int)
 			errs := make(chan error)
 
-			go func(test test) {
-				c := intcode.Code(test.input.code)
+			go func(ts test) {
+				c := intcode.Code(ts.input.code)
 				errs <- c.Exec(ctx, in, out)
-			}(test)
+			}(ts)
 
-			go func(test test) {
-				for _, i := range test.input.in {
+			go func(ts test) {
+				for _, i := range ts.input.in {
 					in <- i
 				}
-			}(test)
+			}(ts)
 
 			r := []int{}
 			var done bool
@@ -153,7 +153,7 @@ func TestIO(t *testing.T) {
 					require.NoError(t, err)
 				}
 			}
-			require.Equal(t, test.expect, r)
+			require.Equal(t, ts.expect, r)
 		})
 	}
 }
