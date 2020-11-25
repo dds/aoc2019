@@ -92,11 +92,33 @@ func part1(input string) (int, point) {
 	return bestScore, bestPoint
 }
 
+func Field(input [][]byte) (r []point) {
+	for y, row := range input {
+		for x, b := range row {
+			if b == space {
+				continue
+			}
+			p := point{x, y}
+			r = append(r, p)
+		}
+	}
+	return
+}
+
 func part2(input string) (int, point) {
 	m := map[point]int{}
 	points := Parse(input)
 
-	var bestPoint point
+	for y, row := range points {
+		for x, b := range row {
+			if b == space {
+				continue
+			}
+			m[point{x, y}] = 0
+		}
+	}
+
+	var basePoint point
 	var bestScore int
 	for p := range m {
 		slopes := map[float64]int{}
@@ -111,56 +133,33 @@ func part2(input string) (int, point) {
 		}
 		m[p] = len(slopes)
 	}
-	field := []point{}
 	for y, row := range points {
 		for x := range row {
 			var score int
 			var ok bool
 			p := point{x, y}
-			field = append(field, p)
 			if score, ok = m[p]; !ok {
 				continue
 			}
 			if score > bestScore {
 				bestScore = score
-				bestPoint = p
+				basePoint = p
 			}
 		}
 	}
+	field := Field(points)
 
-	from := bestPoint
-	targets := vaporize(from, field)
-	fmt.Println("targets", targets)
-	n := 0
-	for {
-		for i := 0; i < len(field); i++ {
-			p := field[i]
-			for _, t := range targets {
-				if t.point != p {
-					continue
-				}
-				// Fire when ready
-				fmt.Println("DESTROYING", p)
-				field[i] = field[len(field)-1]
-				field[len(field)-1] = point{}
-				field = field[:len(field)-1]
-				n++
-				if n == 200 {
-					return 100*t.x + t.y, t.point
-				}
-			}
-		}
-		targets = vaporize(from, field)
-		if len(targets) == 0 {
-			break
-		}
+	targets := vaporize(basePoint, field)
+	if len(targets) >= 200 {
+		return 100*targets[199].x + targets[199].y, targets[199].point
 	}
-	return 0, from
+	return 0, basePoint
 }
 
 type target struct {
 	point
-	r, d float64
+	r angle
+	d float64
 }
 
 type byR []target
@@ -169,14 +168,32 @@ func (a byR) Len() int           { return len(a) }
 func (a byR) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a byR) Less(i, j int) bool { return a[i].r < a[j].r }
 
-func vaporize(from point, field []point) []target {
-	m := map[float64]target{}
+type angle float64
+
+// Normalized returns an equivalent angle in (0, 2π].
+func (a angle) normalized() angle {
+	rad := math.Remainder(float64(a), 2*math.Pi)
+	if rad <= -math.Pi {
+		rad = math.Pi
+	}
+	rad += math.Pi / 2.0
+	if rad < 0 {
+		rad += 2 * math.Pi
+	}
+	return angle(rad)
+}
+
+func vaporize(base point, field []point) []target {
+	m := map[angle]target{}
 	targets := byR{}
 	for _, p := range field {
-		dy := float64(from.y - p.y)
-		dx := float64(from.x - p.x)
-		r := math.Atan2(dy, dx)
-		d := dx*dx + dy*dy
+		if p == base {
+			continue
+		}
+		dy := float64(p.y - base.y)
+		dx := float64(p.x - base.x)
+		d := math.Hypot(dx, dy)
+		r := angle(math.Atan2(dy, dx)).normalized()
 		t := target{p, r, d}
 		if m[r].d != 0 && d >= m[r].d {
 			continue
