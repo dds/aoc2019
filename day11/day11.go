@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"sort"
 
 	"github.com/dds/aoc2019/intcode"
 	"github.com/dds/aoc2019/util"
@@ -16,28 +17,44 @@ func main() {
 	// fmt.Println(part2(ctx, Input))
 }
 
+type turn int
+
+const (
+	L turn = iota
+)
+
+func (t turn) String() string {
+	if t == 0 {
+		return "L"
+	}
+	return "R"
+}
+
 type dir int
 
 const (
-	Up dir = iota
-	Right
-	Down
-	Left
+	north dir = iota
+	east
+	south
+	west
 )
 
 func (d dir) normalize() dir {
+	if d < 0 {
+		d += 4
+	}
 	return d % 4
 }
 
 func (d dir) String() string {
-	switch d.normalize() {
-	case Up:
+	switch d := d.normalize(); d {
+	case north:
 		return "^"
-	case Right:
+	case east:
 		return ">"
-	case Down:
+	case south:
 		return "v"
-	case Left:
+	case west:
 		return "<"
 	}
 	return ""
@@ -45,25 +62,11 @@ func (d dir) String() string {
 
 type color int
 
-const (
-	Black color = iota
-	White
-)
-
 func (c color) String() string {
 	if c == 0 {
 		return "."
 	}
 	return "#"
-}
-
-type rec struct {
-	color color
-	dir   dir
-}
-
-func (r rec) String() string {
-	return fmt.Sprintf("{%v %v}", r.color, r.dir)
 }
 
 func recs(ctx context.Context, i <-chan int) <-chan rec {
@@ -88,7 +91,7 @@ func recs(ctx context.Context, i <-chan int) <-chan rec {
 				if !ok {
 					return
 				}
-				r.dir = dir(t)
+				r.turn = turn(t)
 			}
 			select {
 			case <-ctx.Done():
@@ -100,35 +103,148 @@ func recs(ctx context.Context, i <-chan int) <-chan rec {
 	return recs
 }
 
-func part1(ctx context.Context, input []int) (r interface{}) {
+func (r rec) String() string {
+	return fmt.Sprintf("{%v %v}", r.color, r.turn)
+}
+
+type rec struct {
+	color color
+	turn  turn
+}
+
+type point struct {
+	x, y int
+}
+
+func (p *point) step(d dir) {
+	switch d := d.normalize(); d {
+	case north:
+		p.y += 1
+	case east:
+		p.x += 1
+	case south:
+		p.y -= 1
+	case west:
+		p.x -= 1
+	}
+}
+
+type byP []point
+
+func (a byP) Len() int      { return len(a) }
+func (a byP) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+func (a byP) Less(i, j int) bool {
+	if a[i].y < a[j].y {
+		return true
+	}
+	return a[i].x < a[j].x
+}
+
+type board map[point]color
+
+func (b board) String() string {
+	if len(b) == 0 {
+		return ""
+	}
+	var minP, maxP point
+	points := byP{}
+	for p := range b {
+		if p.x < minP.x {
+			minP.x = p.x
+		}
+		if p.y < minP.y {
+			minP.y = p.y
+		}
+		if p.x > maxP.x {
+			maxP.x = p.x
+		}
+		if p.y > maxP.y {
+			maxP.y = p.y
+		}
+		points = append(points, p)
+	}
+	sort.Sort(points)
+
+	w := maxP.x - minP.x
+	h := maxP.y - minP.y
+	d := make([][]byte, h+1)
+	for y := 0; y < h+1; y++ {
+		row := make([]byte, w+1)
+		for x := 0; x < w+1; x++ {
+			row[x] += '.'
+		}
+		d[y] = row
+	}
+
+	T := func(p point) point {
+		p.x -= minP.x
+		p.y -= minP.y
+		return p
+	}
+	for _, p := range points {
+		if b[p] != 1 {
+			continue
+		}
+		q := T(p)
+		d[q.y][q.x] = '#'
+	}
+	s := "\n\n"
+	for y := 0; y < h+1; y++ {
+		s += string(d[y]) + "\n"
+	}
+	return s
+}
+
+func part1(ctx context.Context, input []int) (r int) {
 	out := make(chan int)
-	in := make(chan int)
-	go intcode.Code(input).Exec(ctx, in, out)
+	in := make(chan int, 1)
+	in <- 0
+	go func() {
+		if err := intcode.Code(input).Exec(ctx, in, out); err != nil {
+			panic(err)
+		}
+	}()
 
 	recs := recs(ctx, out)
 
-	go func() {
-		for i := 0; i < 10; i++ {
-			in <- 0
+	var m = make(board)
+	var p point
+	var d dir
+	for {
+		// Process output
+		select {
+		case <-ctx.Done():
+			return
+		case t, ok := <-recs:
+			if !ok {
+				return len(m)
+			}
+			m[p] = t.color
+			if t.turn == L {
+				d--
+			} else {
+				d++
+			}
+			d = d.normalize()
+			p.step(d)
 		}
-		close(in)
-	}()
-
-	s := []rec{}
-	for i := range recs {
-		s = append(s, i)
+		// Send input
+		select {
+		case <-ctx.Done():
+			return len(m)
+		case in <- int(m[p]):
+		}
 	}
-	return fmt.Sprint(s)
 }
 
-func part2(ctx context.Context, input []int) (r interface{}) {
-	out := make(chan int)
-	in := make(chan int)
-	go intcode.Code(input).Exec(ctx, in, out)
-	in <- 2
-	s := []int{}
-	for i := range out {
-		s = append(s, i)
-	}
-	return fmt.Sprint(s)
-}
+// func part2(ctx context.Context, input []int) (r interface{}) {
+// 	out := make(chan int)
+// 	in := make(chan int)
+// 	go intcode.Code(input).Exec(ctx, in, out)
+// 	in <- 2
+// 	s := []int{}
+// 	for i := range out {
+// 		s = append(s, i)
+// 	}
+// 	return fmt.Sprint(s)
+// }
