@@ -3,10 +3,10 @@ package main
 import (
 	"fmt"
 
-	"github.com/dds/aoc2019/util"
+	"github.com/dds/aoc2019/lib"
 )
 
-var Input = util.InputInts(util.Inputs[2], util.CSVParser)[0]
+var Input = lib.InputInts(lib.Inputs[2], lib.CSVParser)[0]
 
 func main() {
 	fmt.Println(part1(Input))

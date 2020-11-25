@@ -3,7 +3,7 @@ package main
 import (
 	"testing"
 
-	"github.com/dds/aoc2019/util"
+	"github.com/dds/aoc2019/lib"
 	"github.com/stretchr/testify/require"
 )
 
@@ -14,7 +14,7 @@ func TestOps(t *testing.T) {
 	}
 	tests := []test{
 		test{
-			input: util.InputInts("1,9,10,3,2,3,11,0,99,30,40,50", util.CSVParser)[0],
+			input: lib.InputInts("1,9,10,3,2,3,11,0,99,30,40,50", lib.CSVParser)[0],
 			expect: []int{
 				3500, 9, 10, 70,
 				2, 3, 11, 0,
@@ -23,25 +23,25 @@ func TestOps(t *testing.T) {
 			},
 		},
 		test{
-			input: util.InputInts("1,0,0,0,99", util.CSVParser)[0],
+			input: lib.InputInts("1,0,0,0,99", lib.CSVParser)[0],
 			expect: []int{
 				2, 0, 0, 0, 99,
 			},
 		},
 		test{
-			input: util.InputInts("2,3,0,3,99", util.CSVParser)[0],
+			input: lib.InputInts("2,3,0,3,99", lib.CSVParser)[0],
 			expect: []int{
 				2, 3, 0, 6, 99,
 			},
 		},
 		test{
-			input: util.InputInts("2,4,4,5,99,0", util.CSVParser)[0],
+			input: lib.InputInts("2,4,4,5,99,0", lib.CSVParser)[0],
 			expect: []int{
 				2, 4, 4, 5, 99, 9801,
 			},
 		},
 		test{
-			input: util.InputInts("1,1,1,4,99,5,6,0,99", util.CSVParser)[0],
+			input: lib.InputInts("1,1,1,4,99,5,6,0,99", lib.CSVParser)[0],
 			expect: []int{
 				30, 1, 1, 4, 2, 5, 6, 0, 99,
 			},

@@ -6,13 +6,13 @@ import (
 	"time"
 
 	"github.com/dds/aoc2019/intcode"
-	"github.com/dds/aoc2019/util"
+	"github.com/dds/aoc2019/lib"
 )
 
-var Input = util.InputInts(util.Inputs[13], util.CSVParser)[0]
+var Input = lib.InputInts(lib.Inputs[13], lib.CSVParser)[0]
 
 func main() {
-	ctx := util.ContextWithSignals(context.Background())
+	ctx := lib.ContextWithSignals(context.Background())
 	fmt.Println(part1(ctx, Input))
 	fmt.Println(part2(ctx, Input))
 }

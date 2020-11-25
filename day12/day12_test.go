@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/dds/aoc2019/util"
+	"github.com/dds/aoc2019/lib"
 	"github.com/stretchr/testify/require"
 )
 
@@ -25,7 +25,7 @@ func TestPart1(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		input := util.InputInts(test.input, util.NumberParser)
+		input := lib.InputInts(test.input, lib.NumberParser)
 		var p, v [N]column
 		for i := 0; i < N; i++ {
 			p[i] = column(input[i])
@@ -75,7 +75,7 @@ func TestPart2(t *testing.T) {
 
 	for i, test := range tests {
 		t.Run(fmt.Sprint(i), func(t *testing.T) {
-			input := util.InputInts(test.input, util.NumberParser)
+			input := lib.InputInts(test.input, lib.NumberParser)
 			require.Equal(t, test.expect, part2(input))
 		})
 	}

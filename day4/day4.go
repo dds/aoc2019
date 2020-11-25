@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/dds/aoc2019/util"
+	"github.com/dds/aoc2019/lib"
 )
 
-var Input = util.InputInts(util.Inputs[4], util.DashParser)[0]
+var Input = lib.InputInts(lib.Inputs[4], lib.DashParser)[0]
 
 func main() {
 	min := Input[0]

@@ -5,10 +5,10 @@ import (
 	"math"
 	"sort"
 
-	"github.com/dds/aoc2019/util"
+	"github.com/dds/aoc2019/lib"
 )
 
-var Input = util.Inputs[10]
+var Input = lib.Inputs[10]
 
 func main() {
 	fmt.Println(part1(Input))

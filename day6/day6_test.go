@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/dds/aoc2019/util"
+	"github.com/dds/aoc2019/lib"
 	"github.com/stretchr/testify/require"
 )
 
@@ -21,7 +21,7 @@ func TestOrbits(t *testing.T) {
 
 	tests := []test{
 		test{
-			input: util.ParseInput(`COM)B
+			input: lib.ParseInput(`COM)B
 B)C
 C)D
 D)E
@@ -51,7 +51,7 @@ K)L
 			},
 		},
 		test{
-			input: util.ParseInput(`COM)B
+			input: lib.ParseInput(`COM)B
 B)C
 C)D
 D)E

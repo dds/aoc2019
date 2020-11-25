@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/dds/aoc2019/util"
+	"github.com/dds/aoc2019/lib"
 )
 
-var Input = strings.TrimSpace(util.Inputs[8])
+var Input = strings.TrimSpace(lib.Inputs[8])
 
 // var Input = `0222112222120000`
 

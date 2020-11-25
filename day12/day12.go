@@ -3,14 +3,14 @@ package main
 import (
 	"fmt"
 
-	"github.com/dds/aoc2019/util"
+	"github.com/dds/aoc2019/lib"
 )
 
-var Input = util.InputInts(util.Inputs[12], util.NumberParser)
+var Input = lib.InputInts(lib.Inputs[12], lib.NumberParser)
 
 func main() {
 	fmt.Println(part1(Input))
-	Input = util.InputInts(util.Inputs[12], util.NumberParser)
+	Input = lib.InputInts(lib.Inputs[12], lib.NumberParser)
 	fmt.Println(part2(Input))
 }
 

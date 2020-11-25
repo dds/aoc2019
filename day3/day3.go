@@ -8,10 +8,10 @@ import (
 	pkgmath "github.com/pkg/math"
 	"gonum.org/v1/gonum/spatial/kdtree"
 
-	"github.com/dds/aoc2019/util"
+	"github.com/dds/aoc2019/lib"
 )
 
-var Input = util.ParseInput(util.Inputs[3], util.CSVParser)
+var Input = lib.ParseInput(lib.Inputs[3], lib.CSVParser)
 
 func main() {
 	path1, path2 := Input[0], Input[1]

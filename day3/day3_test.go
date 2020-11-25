@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/dds/aoc2019/util"
+	"github.com/dds/aoc2019/lib"
 	"github.com/stretchr/testify/require"
 )
 
@@ -32,7 +32,7 @@ U98,R91,D20,R16,D67,R40,U7,R15,U6,R7`,
 	}
 	for i, test := range tests {
 		t.Run(fmt.Sprint(i), func(t *testing.T) {
-			input := util.ParseInput(test.input, util.CSVParser)
+			input := lib.ParseInput(test.input, lib.CSVParser)
 			path1 := input[0]
 			path2 := input[1]
 			require.Equal(t, test.expect, Cross(path1, path2))
@@ -59,7 +59,7 @@ U98,R91,D20,R16,D67,R40,U7,R15,U6,R7`,
 	}
 	for i, test := range tests {
 		t.Run(fmt.Sprint(i), func(t *testing.T) {
-			input := util.ParseInput(test.input, util.CSVParser)
+			input := lib.ParseInput(test.input, lib.CSVParser)
 			path1 := input[0]
 			path2 := input[1]
 			require.Equal(t, test.expect, MinWalk(path1, path2))

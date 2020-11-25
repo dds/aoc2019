@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/dds/aoc2019/util"
+	"github.com/dds/aoc2019/lib"
 )
 
 const (
@@ -13,10 +13,10 @@ const (
 	SAN = "SAN"
 )
 
-var Input = util.ParseInput(util.Inputs[6], ParseInput)
+var Input = lib.ParseInput(lib.Inputs[6], ParseInput)
 
 func ParseInput(input string) []string {
-	return util.TrimSpace(strings.FieldsFunc(input, func(c rune) bool { return c == ')' }))
+	return lib.TrimSpace(strings.FieldsFunc(input, func(c rune) bool { return c == ')' }))
 }
 
 func main() {

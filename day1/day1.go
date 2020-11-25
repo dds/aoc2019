@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/dds/aoc2019/util"
+	"github.com/dds/aoc2019/lib"
 )
 
 func main() {
-	input := util.InputInts(util.Inputs[1], util.CSVParser)
+	input := lib.InputInts(lib.Inputs[1], lib.CSVParser)
 	fmt.Println(part1(input))
 	fmt.Println(part2(input))
 }
