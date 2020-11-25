@@ -16,8 +16,88 @@ func main() {
 	// fmt.Println(part2(ctx, Input))
 }
 
-type out struct {
-	color, dir int
+type dir int
+
+const (
+	Up dir = iota
+	Right
+	Down
+	Left
+)
+
+func (d dir) normalize() dir {
+	return d % 4
+}
+
+func (d dir) String() string {
+	switch d.normalize() {
+	case Up:
+		return "^"
+	case Right:
+		return ">"
+	case Down:
+		return "v"
+	case Left:
+		return "<"
+	}
+	return ""
+}
+
+type color int
+
+const (
+	Black color = iota
+	White
+)
+
+func (c color) String() string {
+	if c == 0 {
+		return "."
+	}
+	return "#"
+}
+
+type rec struct {
+	color color
+	dir   dir
+}
+
+func (r rec) String() string {
+	return fmt.Sprintf("{%v %v}", r.color, r.dir)
+}
+
+func recs(ctx context.Context, i <-chan int) <-chan rec {
+	recs := make(chan rec)
+	go func() {
+		defer close(recs)
+		var r rec
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case t, ok := <-i:
+				if !ok {
+					return
+				}
+				r = rec{color: color(t)}
+			}
+			select {
+			case <-ctx.Done():
+				return
+			case t, ok := <-i:
+				if !ok {
+					return
+				}
+				r.dir = dir(t)
+			}
+			select {
+			case <-ctx.Done():
+				return
+			case recs <- r:
+			}
+		}
+	}()
+	return recs
 }
 
 func part1(ctx context.Context, input []int) (r interface{}) {
@@ -25,14 +105,17 @@ func part1(ctx context.Context, input []int) (r interface{}) {
 	in := make(chan int)
 	go intcode.Code(input).Exec(ctx, in, out)
 
+	recs := recs(ctx, out)
+
 	go func() {
 		for i := 0; i < 10; i++ {
 			in <- 0
 		}
 		close(in)
 	}()
-	s := []int{}
-	for i := range out {
+
+	s := []rec{}
+	for i := range recs {
 		s = append(s, i)
 	}
 	return fmt.Sprint(s)
