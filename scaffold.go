@@ -5,9 +5,10 @@ import (
 	"testing"
 
 	"github.com/dds/aoc2019/lib"
+	"github.com/dds/aoc2019/lib/inputs"
 )
 
-var Input = lib.Inputs[0]
+var Input = lib.InputInts(inputs.TestInput1(), lib.NumberParser)
 
 func Test(t *testing.T) {
 	// type test struct {
@@ -33,10 +34,11 @@ func main() {
 	fmt.Println(part2(Input))
 }
 
-func part1(input string) interface{} {
-	return ""
+func part1(input [][]int) (rc int) {
+	fmt.Println(input)
+	return
 }
 
-func part2(input string) interface{} {
-	return ""
+func part2(input [][]int) (rc int) {
+	return
 }
