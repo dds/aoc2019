@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/dds/aoc2019/intcode"
@@ -10,25 +11,31 @@ import (
 var Input = util.InputInts(util.Inputs[5], util.CSVParser)[0]
 
 func main() {
-	fmt.Println(part1(Input))
-	fmt.Println(part2(Input))
+	ctx := util.ContextWithSignals(context.Background())
+	fmt.Println(part1(ctx, Input))
+	fmt.Println(part2(ctx, Input))
 }
 
-func part1(input []int) (r []int) {
-	var err error
-	_, r, err = intcode.Exec(input, []int{1})
-	if err != nil {
-		panic(err)
+func part1(ctx context.Context, input []int) string {
+	out := make(chan int)
+	in := make(chan int)
+	go intcode.Code(input).Exec(ctx, in, out)
+	in <- 1
+	s := []int{}
+	for i := range out {
+		s = append(s, i)
 	}
-	return
+	return fmt.Sprint(s)
 }
 
-func part2(input []int) (r []int) {
-	var err error
-	_, r, err = intcode.Exec(input, []int{5})
-	if err != nil {
-		panic(err)
+func part2(ctx context.Context, input []int) string {
+	out := make(chan int)
+	in := make(chan int)
+	go intcode.Code(input).Exec(ctx, in, out)
+	in <- 5
+	s := []int{}
+	for i := range out {
+		s = append(s, i)
 	}
-	return
-
+	return fmt.Sprint(s)
 }
