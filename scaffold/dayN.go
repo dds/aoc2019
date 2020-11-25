@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/dds/aoc2019/util"
+	"github.com/dds/aoc2019/lib"
 )
 
-var Input = util.Inputs[0]
+var Input = lib.Inputs[0]
 
 func Test(t *testing.T) {
 	// type test struct {
