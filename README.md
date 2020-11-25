@@ -1,6 +1,7 @@
 # Advent of Code 2019 (Golang)
 
-[![Build Status](https://travis-ci.com/dds/aoc2019.svg?branch=main)](https://travis-ci.com/github/dds/aoc2019)
+[![Build Status](https://github.com/dds/aoc2019/workflows/ci/badge.svg)](https://github.com/dds/aoc2019/runs/)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 This repository is my solutions to [Advent of Code, 2019](https://adventofcode.com/2019).
 
