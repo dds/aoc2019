@@ -205,4 +205,5 @@ L995,D598,R577,U346,L797,D375,R621,D709,R781,U55,R965,U327,L479,U148,L334,U93,R6
 	Inputs[8] = inputs.Day8()
 	Inputs[9] = inputs.Day9()
 	Inputs[10] = inputs.Day10()
+	Inputs[11] = inputs.Day11()
 }
