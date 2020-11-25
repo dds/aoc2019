@@ -14,7 +14,7 @@ var Input = util.InputInts(util.Inputs[11], util.CSVParser)[0]
 func main() {
 	ctx := util.ContextWithSignals(context.Background())
 	fmt.Println(part1(ctx, Input))
-	// fmt.Println(part2(ctx, Input))
+	fmt.Println(part2(ctx, Input))
 }
 
 type turn int
@@ -189,7 +189,7 @@ func (b board) String() string {
 		d[q.y][q.x] = '#'
 	}
 	s := "\n\n"
-	for y := 0; y < h+1; y++ {
+	for y := h; y >= 0; y-- {
 		s += string(d[y]) + "\n"
 	}
 	return s
@@ -237,14 +237,45 @@ func part1(ctx context.Context, input []int) (r int) {
 	}
 }
 
-// func part2(ctx context.Context, input []int) (r interface{}) {
-// 	out := make(chan int)
-// 	in := make(chan int)
-// 	go intcode.Code(input).Exec(ctx, in, out)
-// 	in <- 2
-// 	s := []int{}
-// 	for i := range out {
-// 		s = append(s, i)
-// 	}
-// 	return fmt.Sprint(s)
-// }
+func part2(ctx context.Context, input []int) (r int) {
+	out := make(chan int)
+	in := make(chan int, 1)
+	in <- 1
+	go func() {
+		if err := intcode.Code(input).Exec(ctx, in, out); err != nil {
+			panic(err)
+		}
+	}()
+
+	recs := recs(ctx, out)
+
+	var m = make(board)
+	var p point
+	var d dir
+	for {
+		// Process output
+		select {
+		case <-ctx.Done():
+			return
+		case t, ok := <-recs:
+			if !ok {
+				return len(m)
+			}
+			m[p] = t.color
+			if t.turn == L {
+				d--
+			} else {
+				d++
+			}
+			d = d.normalize()
+			p.step(d)
+		}
+		fmt.Println(m)
+		// Send input
+		select {
+		case <-ctx.Done():
+			return len(m)
+		case in <- int(m[p]):
+		}
+	}
+}
