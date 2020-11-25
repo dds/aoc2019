@@ -126,16 +126,16 @@ func TestIO(t *testing.T) {
 			out := make(chan int)
 			errs := make(chan error)
 
-			go func() {
+			go func(test test) {
 				c := intcode.Code(test.input.code)
 				errs <- c.Exec(ctx, in, out)
-			}()
+			}(test)
 
-			go func() {
+			go func(test test) {
 				for _, i := range test.input.in {
 					in <- i
 				}
-			}()
+			}(test)
 
 			r := []int{}
 			var done bool
