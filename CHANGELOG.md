@@ -1,4 +1,8 @@
-## 1.0.5 (2020-11-25)
+## [1.0.6](https://github.com/dds/aoc2019/compare/v1.0.5...v1.0.6) (2020-11-25)
+
+
+
+## [1.0.5](https://github.com/dds/aoc2019/compare/81ecb912b5c7b2dbef14ca44bd785d1c361202ad...v1.0.5) (2020-11-25)
 
 
 ### Bug Fixes
