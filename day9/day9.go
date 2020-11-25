@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/dds/aoc2020/intcode"
-	"github.com/dds/aoc2020/util"
+	"github.com/dds/aoc2019/intcode"
+	"github.com/dds/aoc2019/util"
 )
 
 var Input = util.InputInts(util.Inputs[9], util.CSVParser)[0]

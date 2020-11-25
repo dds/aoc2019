@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/dds/aoc2020/util"
+	"github.com/dds/aoc2019/util"
 )
 
 var Input = util.InputInts(util.Inputs[4], util.DashParser)[0]

@@ -8,7 +8,7 @@ import (
 	pkgmath "github.com/pkg/math"
 	"gonum.org/v1/gonum/spatial/kdtree"
 
-	"github.com/dds/aoc2020/util"
+	"github.com/dds/aoc2019/util"
 )
 
 var Input = util.ParseInput(util.Inputs[3], util.CSVParser)

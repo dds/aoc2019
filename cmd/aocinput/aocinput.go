@@ -6,7 +6,7 @@ import (
 
 	"github.com/alecthomas/kong"
 	"github.com/atotto/clipboard"
-	"github.com/dds/aoc2020/util"
+	"github.com/dds/aoc2019/util"
 )
 
 var CLI struct {

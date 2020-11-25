@@ -1,5 +1,7 @@
 # Advent of Code 2019 (Golang)
 
+[![Build Status](https://travis-ci.com/dds/aoc2019.svg?branch=main)](https://travis-ci.com/github/dds/aoc2019)
+
 This repository is my solutions to [Advent of Code, 2019](https://adventofcode.com/2019).
 
 ## Prerequisites
@@ -12,7 +14,7 @@ Download, build, and install the solutions like so:
 
 ```sh
 # Download, build, and install solutions from this repo
-go get github.com/dds/aoc2020/...
+go get github.com/dds/aoc2019/...
 
 # Run solution for day 1
 day1

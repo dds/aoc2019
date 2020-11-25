@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/dds/aoc2020/intcode"
+	"github.com/dds/aoc2019/intcode"
 	"github.com/stretchr/testify/require"
 )
 

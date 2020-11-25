@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/dds/aoc2020/util"
+	"github.com/dds/aoc2019/util"
 	"github.com/stretchr/testify/require"
 )
 
