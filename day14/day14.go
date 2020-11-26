@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"regexp"
+	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/dds/aoc2019/lib"
@@ -39,8 +41,34 @@ func main() {
 	fmt.Println(part2(Input))
 }
 
+const Ore = "ORE"
+
+type rec struct {
+	n   int
+	typ string
+}
+
+func read(s string) (r rec) {
+	i := strings.Fields(s)
+	n, err := strconv.Atoi(i[0])
+	if err != nil {
+		panic(err)
+	}
+	r.n = n
+	r.typ = i[1]
+	return
+}
+
 func part1(input [][]string) (rc int) {
-	fmt.Println(input)
+	m := map[rec][]rec{}
+	for _, row := range input {
+		last := read(row[len(row)-1])
+		m[last] = []rec{}
+		for j := 0; j < len(row)-1; j++ {
+			m[last] = append(m[last], read(row[j]))
+		}
+	}
+	fmt.Println(m)
 	return
 }
 
