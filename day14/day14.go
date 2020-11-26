@@ -23,7 +23,10 @@ func main() {
 	fmt.Println(part2(Input))
 }
 
-const Ore = "ORE"
+const (
+	Ore  = "ORE"
+	Fuel = "FUEL"
+)
 
 type term struct {
 	n   int
@@ -59,29 +62,32 @@ func mkformulae(input [][]string) formulae {
 	}
 	return m
 }
-func (f formulae) inputs(typ string, prs ...map[string]int) (pr map[string]int) {
+func (f formulae) react(typ string, prs ...map[string]int) (pr map[string]int) {
 	if len(prs) <= 0 {
 		pr = make(map[string]int)
 	} else {
 		pr = prs[0]
 	}
+	pr[typ] += f[typ].outputs
 	for _, trm := range f[typ].terms {
 		if trm.typ == Ore {
-			sum += trm.n
+			pr[Ore] += trm.n
 			continue
 		}
-		sum += trm.n * f.ore(trm.typ, pr)
+		for pr[trm.typ] < trm.n {
+			pr = f.react(trm.typ, pr)
+		}
+		pr[trm.typ] -= trm.n
 	}
-	return sum
+	return
 }
 
 func part1(input [][]string) (rc int) {
 	m := mkformulae(input)
-	fmt.Println(m["FUEL"])
-	fmt.Println(m.ore("FUEL"))
+	rc = m.react(Fuel)[Ore]
 	return
 }
 
-func part2(input [][]string) (rc int) {
-	return
+func part2(input [][]string) int {
+	return 0
 }
