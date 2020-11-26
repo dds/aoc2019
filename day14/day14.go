@@ -5,7 +5,6 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-	"testing"
 
 	"github.com/dds/aoc2019/lib"
 	"github.com/dds/aoc2019/lib/inputs"
@@ -13,27 +12,10 @@ import (
 
 var inputRE = regexp.MustCompile(`\d+ \w+`)
 
-var Input = lib.ParseInput(inputs.Day14(), func(s string) []string {
+var Input = lib.ParseInput(inputs.Day14(), Parser)
+
+func Parser(s string) []string {
 	return lib.TrimSpace(inputRE.FindAllString(s, -1))
-})
-
-func Test(t *testing.T) {
-	// type test struct {
-	// 	input  int
-	// 	expect int
-	// }
-
-	// tests := []test{
-	// 	test{
-	// 		// ...
-	// 	},
-	// }
-
-	// for i, test := range tests {
-	// 	t.Run(fmt.Sprint(i), func(t *testing.T) {
-	// 		require.Equal(t, test.expect, test.input)
-	// 	})
-	// }
 }
 
 func main() {
@@ -43,32 +25,60 @@ func main() {
 
 const Ore = "ORE"
 
-type rec struct {
+type term struct {
 	n   int
 	typ string
 }
 
-func read(s string) (r rec) {
+func read(s string) (t term) {
 	i := strings.Fields(s)
 	n, err := strconv.Atoi(i[0])
 	if err != nil {
 		panic(err)
 	}
-	r.n = n
-	r.typ = i[1]
+	t.n = n
+	t.typ = i[1]
 	return
 }
 
-func part1(input [][]string) (rc int) {
-	m := map[rec][]rec{}
+type formula struct {
+	outputs int
+	terms   []term
+}
+type formulae map[string]formula
+
+func mkformulae(input [][]string) formulae {
+	m := make(formulae)
 	for _, row := range input {
-		last := read(row[len(row)-1])
-		m[last] = []rec{}
+		t := read(row[len(row)-1])
+		f := formula{outputs: t.n}
 		for j := 0; j < len(row)-1; j++ {
-			m[last] = append(m[last], read(row[j]))
+			f.terms = append(f.terms, read(row[j]))
 		}
+		m[t.typ] = f
 	}
-	fmt.Println(m)
+	return m
+}
+func (f formulae) inputs(typ string, prs ...map[string]int) (pr map[string]int) {
+	if len(prs) <= 0 {
+		pr = make(map[string]int)
+	} else {
+		pr = prs[0]
+	}
+	for _, trm := range f[typ].terms {
+		if trm.typ == Ore {
+			sum += trm.n
+			continue
+		}
+		sum += trm.n * f.ore(trm.typ, pr)
+	}
+	return sum
+}
+
+func part1(input [][]string) (rc int) {
+	m := mkformulae(input)
+	fmt.Println(m["FUEL"])
+	fmt.Println(m.ore("FUEL"))
 	return
 }
 
