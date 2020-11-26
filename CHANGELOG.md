@@ -1,3 +1,12 @@
+# [1.1.0](https://github.com/dds/aoc2019/compare/v1.0.6...v1.1.0) (2020-11-26)
+
+
+### Features
+
+* day13 p2 ([52d021b](https://github.com/dds/aoc2019/commit/52d021b247873d8c2a0871546a4308cd18c3ed76))
+
+
+
 ## [1.0.6](https://github.com/dds/aoc2019/compare/v1.0.5...v1.0.6) (2020-11-25)
 
 
