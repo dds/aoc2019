@@ -226,5 +226,7 @@ L995,D598,R577,U346,L797,D375,R621,D709,R781,U55,R965,U327,L479,U148,L334,U93,R6
 <x=6, y=0, z=-1>
 `
 	Inputs[13] = inputs.Day13()
+	Inputs[14] = inputs.Day14()
+	Inputs[15] = inputs.Day15()
 
 }
