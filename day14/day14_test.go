@@ -52,11 +52,40 @@ func TestPart1(t *testing.T) {
 	for i, test := range tests {
 		t.Run(fmt.Sprint(i), func(t *testing.T) {
 			in := lib.ParseInput(test.input, Parser)
-			m := mkformulae(in)
-			fmt.Println(m)
-			r := m.react(Fuel)
-			fmt.Println(r)
-			require.Equal(t, test.expect, r[Ore])
+			require.Equal(t, test.expect, part1(in))
+		})
+	}
+}
+
+func TestPart2(t *testing.T) {
+	type test struct {
+		input  string
+		expect int
+	}
+
+	tests := []test{
+		test{
+			input: `157 ORE => 5 NZVS
+165 ORE => 6 DCFZ
+44 XJWVT, 5 KHKGT, 1 QDVJ, 29 NZVS, 9 GPVTF, 48 HKGWZ => 1 FUEL
+12 HKGWZ, 1 GPVTF, 8 PSHF => 9 QDVJ
+179 ORE => 7 PSHF
+177 ORE => 5 HKGWZ
+7 DCFZ, 7 PSHF => 2 XJWVT
+165 ORE => 2 GPVTF
+3 DCFZ, 7 NZVS, 5 HKGWZ, 10 PSHF => 8 KHKGT`,
+			expect: 82892753,
+		},
+		// test{
+		// 	input: ``,
+		// 	expect: ,
+		// },
+	}
+
+	for i, test := range tests {
+		t.Run(fmt.Sprint(i), func(t *testing.T) {
+			in := lib.ParseInput(test.input, Parser)
+			require.Equal(t, test.expect, part2(in))
 		})
 	}
 }
