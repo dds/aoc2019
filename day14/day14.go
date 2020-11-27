@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"regexp"
 	"strconv"
 	"strings"
@@ -28,13 +29,13 @@ const (
 	Fuel = "FUEL"
 )
 
-type term struct {
+type reagent struct {
 	n   int
 	typ string
 }
 
-func read(s string) (t term) {
-	// From "5 NZVS" into term{n: 5, typ: "NZVS"}
+func read(s string) (t reagent) {
+	// From "5 NZVS" into reagent{n: 5, typ: "NZVS"}
 	i := strings.Fields(s)
 	n, err := strconv.Atoi(i[0])
 	if err != nil {
@@ -45,11 +46,10 @@ func read(s string) (t term) {
 	return
 }
 
-// A formula produces a number of output from a list of terms.
+// A formula produces a number of output from a list of reagents.
 type formula struct {
-	outputs int
-	terms   []term
-	ore     float64
+	outputs  int
+	reagents []reagent
 }
 type formulae map[string]formula
 
@@ -59,86 +59,63 @@ func mkformulae(input [][]string) formulae {
 		t := read(row[len(row)-1])
 		f := formula{outputs: t.n}
 		for j := 0; j < len(row)-1; j++ {
-			f.terms = append(f.terms, read(row[j]))
+			f.reagents = append(f.reagents, read(row[j]))
 		}
 		m[t.typ] = f
-	}
-	// Add ore amounts for fundamental types.
-	for _, f := range m {
-		if len(f.terms) == 1 && f.terms[0].typ == Ore {
-			f.ore = float64(f.terms[0].n) / float64(f.outputs)
-		}
 	}
 	return m
 }
 
-func (f formulae) fuelOre(n int) int {
-	m := map[string]int{} // By products
-	formula := f[Fuel]
-	terms := make([]term, len(formula.terms))
-	copy(terms, formula.terms)
-	ore := 0
-
-	for _, t := range terms {
-		t.n *= n
-		var o int
-		o, m = f.ore(t, m)
-		ore += o
+func (f formulae) ore(typ string, n int, byproducts map[string]int) int {
+	var ore = 0
+	var required = []reagent{reagent{n: n, typ: typ}}
+	for len(required) > 0 {
+		t := required[0]
+		required = required[1:]
+		var n = t.n
+		if t.typ == Ore {
+			ore += n
+			continue
+		}
+		if byproducts[t.typ] > n {
+			byproducts[t.typ] -= n
+		} else {
+			n -= byproducts[t.typ]
+			byproducts[t.typ] = 0
+		}
+		recipe := f[t.typ]
+		scale := int(math.Ceil(float64(n) / float64(recipe.outputs)))
+		byproducts[t.typ] += scale*recipe.outputs - n
+		for _, reagent := range recipe.reagents {
+			reagent.n = scale * reagent.n
+			required = append(required, reagent)
+		}
 	}
 	return ore
 }
 
-func (f formulae) ore(t term, m map[string]int) (int, map[string]int) {
-
-	ore := 0
-
-	for m[t.typ] < t.n {
-		for _, trm := range f[t.typ].terms {
-			if trm.typ == Ore {
-				ore += trm.n
-				continue
-			}
-			if m[trm.typ] > trm.n {
-				m[trm.typ] -= trm.n
-				continue
-			}
-			var o int
-			o, m = f.ore(trm, m)
-			ore += o
-			m[trm.typ] -= trm.n
-		}
-		m[t.typ] += f[t.typ].outputs
-	}
-	return ore, m
-}
-
 func part1(input [][]string) (rc int) {
 	m := mkformulae(input)
-	rc = m.fuelOre(1)
+	rc = m.ore(Fuel, 1, map[string]int{})
 	return
 }
 
 func part2(input [][]string) (rc int) {
 	m := mkformulae(input)
-	orePerFuel := m.fuelOre(1)
-	maxOre := 1000 * 1000 * 1000 * 1000
-	oneThousand := m.fuelOre(1000)
-	var a = maxOre / orePerFuel
-	fmt.Println("One FUEL is ", orePerFuel, "ore. Estimating ", a, "min fuel.")
-	fmt.Println("1000 FUEL is ", oneThousand, "ore.")
-
-	var ore = 0
-	for i := 0; i < 2440; i++ {
-		ore += oneThousand
+	ore := 1000 * 1000 * 1000 * 1000
+	var i = 1
+	rc = 1
+	for {
+		o := m.ore(Fuel, rc+i, map[string]int{})
+		if o > ore {
+			if i != 1 {
+				i = 1
+				continue
+			}
+			break
+		}
+		rc += i
+		i *= 2
 	}
-	c := 2440 * 1000
-	fmt.Println(c, "FUEL is ", ore, "ore.")
-	var j = 0
-	for ore < maxOre {
-		ore += m.fuelOre(1)
-		j++
-	}
-	fmt.Println(j, "j, ", c+j, "FUEL is ", ore, "ore.")
-	rc = c + j
 	return
 }
