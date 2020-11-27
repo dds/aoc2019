@@ -77,8 +77,9 @@ func (f formulae) ore(typ string, n int, byproducts map[string]int) int {
 			ore += n
 			continue
 		}
-		if byproducts[t.typ] > n {
+		if byproducts[t.typ] >= n {
 			byproducts[t.typ] -= n
+			continue
 		} else {
 			n -= byproducts[t.typ]
 			byproducts[t.typ] = 0
