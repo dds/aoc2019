@@ -1,7 +1,6 @@
 package main
 
 import (
-	"container/heap"
 	"context"
 	"fmt"
 	"time"
@@ -17,8 +16,7 @@ var Input = lib.InputInts(inputs.Day15(), lib.CSVParser)[0]
 func main() {
 	ctx, cancel := context.WithDeadline(lib.ContextWithSignals(context.Background()), time.Now().Add(120*time.Second))
 	defer cancel()
-	fmt.Println(part1(ctx, Input))
-	fmt.Println(part2(ctx, Input))
+	day15(ctx, Input)
 }
 
 type point struct {
@@ -139,11 +137,9 @@ func (g *grid) draw() {
 }
 
 const (
-	empty       = ' '
-	wall        = '#'
-	visited     = '.'
-	droid       = 'D'
-	destination = 'G'
+	wall    = '#'
+	visited = '.'
+	droid   = 'D'
 )
 
 // input values
@@ -161,7 +157,7 @@ const (
 	goal  = 2
 )
 
-func part1(ctx context.Context, input []int) (rc int) {
+func day15(ctx context.Context, input []int) {
 	in, out := make(chan int), make(chan int)
 	errs := make(chan error)
 	go func() {
@@ -189,25 +185,26 @@ func part1(ctx context.Context, input []int) (rc int) {
 	}()
 	defer func() {
 		g.Fini()
-		fmt.Println("... and we're back")
 		if err := recover(); err != nil {
 			panic(err)
 		}
 	}()
 
 	var (
-		p, q        point
-		w, h        int
-		trail       []point
-		quit        bool
-		toSend      int
-		refreshRate = time.Second / 1000
-		refresh     = time.NewTimer(refreshRate)
+		p, q                   point
+		trail                  []point
+		quit                   bool
+		toSend                 int
+		refreshRate            = time.Second / 1000
+		refresh                = time.NewTimer(refreshRate)
+		oxygenSystem, origin   point
+		distanceToOxygenSystem int
 	)
 
-	g.cells[p] = 'O'
-	var oxygenSystem point
 	for !quit {
+		if p == origin && oxygenSystem != origin {
+			break
+		}
 		var backtracking bool
 		q, toSend = g.cells.next(p)
 		if toSend == -1 {
@@ -216,11 +213,10 @@ func part1(ctx context.Context, input []int) (rc int) {
 			if len(trail) < 0 {
 				panic(fmt.Errorf("No trail. p %v, q %v", p, q))
 			}
+		}
+		if backtracking {
 			q = trail[0]
 			toSend = direction(p, q)
-			g.msg += fmt.Sprintf("\nFinding direction: p %v, q %v, toSend %v", p, q, toSend)
-		} else {
-			g.msg = fmt.Sprintf("At %v, trying %v, trail: %v", p, q, trail)
 		}
 
 		select {
@@ -242,27 +238,20 @@ func part1(ctx context.Context, input []int) (rc int) {
 			if !ok {
 				quit = true
 			}
-			g.msg += fmt.Sprintf("\nReceived: %v, %v", c, ok)
 			switch c {
 			case goal:
-				g.cells[q] = destination
-				g.cells[p] = droid
-				quit = true
 				oxygenSystem = q
+				distanceToOxygenSystem = len(trail) + 1
+				fallthrough
 			case moved:
-				if !(p.x == 0 && p.y == 0) {
-					g.cells[p] = visited
-				}
+				g.cells[p] = visited
 				g.cells[q] = droid
 				if !backtracking {
 					trail = append([]point{p}, trail...)
 				} else {
 					trail = trail[1:]
 				}
-				g.msg += fmt.Sprintf("\nUpdating point from %v => %v", p, q)
 				p = q
-				w = lib.Max(w, 2*lib.Sign(p.x)*p.x)
-				h = lib.Max(w, 2*lib.Sign(p.y)*p.y)
 			case stuck:
 				g.cells[q] = wall
 			}
@@ -271,155 +260,51 @@ func part1(ctx context.Context, input []int) (rc int) {
 		refresh.Reset(refreshRate)
 		g.draw()
 	}
-	g.msg += fmt.Sprintf("\nOxygen system is at %v\nGrid is %vx%v. Press escape to quit.", oxygenSystem, w, h)
-	g.draw()
-	select {
-	case <-ctx.Done():
-	case <-userQuit:
-	case err := <-errs:
-		panic(err)
-	}
-	fmt.Printf("Found oxygen system at %v, finding optimal path...\n", oxygenSystem)
-	optimalPath, err := g.astar(point{0, 0}, oxygenSystem)
-	if err != nil {
-		panic(err)
-	}
-	refreshRate = time.Second / 2
-	for _, p := range optimalPath {
-		g.cells[p] = '+'
-		g.draw()
+
+	// Part 2
+	// breadth first search from oxygen tank until no more neighbors..
+	refreshRate = time.Second / 50
+	g.cells[oxygenSystem] = 'O'
+	toExpand := []point{oxygenSystem}
+	i := 0
+	quit = false
+	for !quit {
+		for _, p := range toExpand {
+			toExpand = toExpand[1:]
+			for _, q := range p.neighbors() {
+				if g.cells[q] == visited || g.cells[q] == droid {
+					g.cells[q] = 'O'
+					toExpand = append(toExpand, q)
+				}
+			}
+		}
+		if len(toExpand) == 0 {
+			quit = true
+		} else {
+			i++
+		}
+		g.msg = fmt.Sprintf("At minute %v", i)
 		select {
 		case <-ctx.Done():
+			panic(ctx.Err())
 		case <-userQuit:
+			quit = true
 		case err := <-errs:
 			panic(err)
 		case <-refresh.C:
-			refresh.Reset(refreshRate)
 		}
+		refresh.Reset(refreshRate)
+		g.draw()
 	}
 	select {
 	case <-ctx.Done():
+		panic(ctx.Err())
 	case <-userQuit:
 	case err := <-errs:
 		panic(err)
 	case <-refresh.C:
-		refresh.Reset(refreshRate)
 	}
-	fmt.Println(len(optimalPath))
-	return
-}
-
-var ErrNoPath = fmt.Errorf("no path")
-
-func (m cells) astar(start point, goal point) (trail []point, err error) {
-	// type visit struct {
-	// 	parent point
-	// 	distanceFromStart
-	// }
-	// visited := map[point]visit{} // map visited node to previous nodes
-
-	// pq := pq{&node{point: start}}
-	// heap.Init(&pq)
-	// p := start
-
-	// for pq.Len() > 0 {
-	// 	u := heap.Pop(&pq).(*node)
-	// 	visited[u.point] = visit{parent: p, distanceFromStart: visit[p].distanceFromStart + 1}
-	// 	p = u.point
-
-	// 	if u.point == goal {
-	// 		for {
-	// 			trail = append([]point{u.point}, trail...)
-	// 			if p, ok := visited[parent]; ok {
-	// 				u.point = p.parent
-	// 				continue
-	// 			}
-	// 			return
-	// 		}
-	// 	}
-
-	// 	// time.Sleep(time.Second / 2)
-	// 	for _, q := range u.point.neighbors() {
-	// 		if _, ok := visited[q]; ok {
-	// 			continue
-	// 		}
-	// 		movementCost := 1
-	// 		if c, ok := m[q]; c == wall {
-	// 			movementCost += 1 << 20
-	// 		} else if !ok {
-	// 			movementCost += 1 << 10
-	// 		}
-	// 		cost := len(trail) + movementCost
-	// 		in, pos := pq.Find(q)
-	// 		if in != nil && cost < in.cost {
-	// 			heap.Remove(&pq, pos) // alternative path is better
-	// 		}
-	// 		var seen bool
-	// 		_, seen = visited[q]
-	// 		// If we have passed this point, restore it if we found a better way to get there.
-	// 		if in != nil && seen && cost < in.cost {
-	// 			delete(visited, q)
-	// 		}
-	// 		if in == nil && !seen {
-	// 			in = &node{point: q, cost: cost + q.distance(goal)}
-	// 			heap.Push(&pq, in)
-	// 		}
-	// 	}
-	// }
-	// err = ErrNoPath
-	return
-}
-
-func part2(ctx context.Context, input []int) (rc int) {
-	return 0
-}
-
-type node struct {
-	point
-	cost int
-	// The index is needed by update and is maintained by the heap.Interface methods.
-	index int // The index of the item in the heap.
-}
-
-type pq []*node
-
-func (pq pq) Find(p point) (*node, int) {
-	for i, q := range pq {
-		if p == q.point {
-			return q, i
-		}
-	}
-	return nil, -1
-}
-
-func (pq pq) Len() int { return len(pq) }
-
-func (pq pq) Less(i, j int) bool {
-	return pq[i].cost < pq[j].cost
-}
-
-func (pq pq) Swap(i, j int) {
-	pq[i], pq[j] = pq[j], pq[i]
-	pq[i].index = i
-	pq[j].index = j
-}
-
-func (pq *pq) Push(x interface{}) {
-	n := len(*pq)
-	node := x.(*node)
-	node.index = n
-	*pq = append(*pq, node)
-}
-
-func (pq *pq) Pop() interface{} {
-	old := *pq
-	n := len(old)
-	item := old[n-1]
-	*pq = old[0 : n-1]
-	return item
-}
-
-func (pq *pq) update(item *node, score int, priority int) {
-	item.cost = score
-	heap.Fix(pq, item.index)
+	g.Fini()
+	fmt.Println(distanceToOxygenSystem)
+	fmt.Println(i)
 }
