@@ -1,3 +1,12 @@
+# [1.4.0](https://github.com/dds/aoc2019/compare/v1.3.0...v1.4.0) (2020-11-29)
+
+
+### Features
+
+* day15 p1 and p2 ([8312040](https://github.com/dds/aoc2019/commit/831204072b35ba5a9511360416877f9a3568bf94))
+
+
+
 # [1.3.0](https://github.com/dds/aoc2019/compare/v1.2.0...v1.3.0) (2020-11-27)
 
 
@@ -31,22 +40,6 @@
 
 
 ## [1.0.6](https://github.com/dds/aoc2019/compare/v1.0.5...v1.0.6) (2020-11-25)
-
-
-
-## [1.0.5](https://github.com/dds/aoc2019/compare/81ecb912b5c7b2dbef14ca44bd785d1c361202ad...v1.0.5) (2020-11-25)
-
-
-### Bug Fixes
-
-* build error ([6f62e35](https://github.com/dds/aoc2019/commit/6f62e35e042f7d22651d124297c23620b4702075))
-* data race in intcode test ([46b8c0b](https://github.com/dds/aoc2019/commit/46b8c0ba17c0d0ca8d3d965bf2cdf17cafbae07d))
-* force next release to 1.0.5 ([fafe43e](https://github.com/dds/aoc2019/commit/fafe43ef083e5a1d5334e5c9e758408ea37a77a4))
-
-
-### Features
-
-* add command to download puzzle inputs ([81ecb91](https://github.com/dds/aoc2019/commit/81ecb912b5c7b2dbef14ca44bd785d1c361202ad))
 
 
 
