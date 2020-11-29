@@ -29,22 +29,6 @@ func (p point) add(x, y int) point {
 	return p
 }
 
-// Estimate the distance from the manhattan distance.
-func (p point) distance(q point) int {
-	var p1, p2 int
-	if q.x > p.x {
-		p1 = q.x - p.x
-	} else {
-		p1 = p.x - q.x
-	}
-	if q.y > p.y {
-		p2 = q.y - p.y
-	} else {
-		p2 = p.y - q.y
-	}
-	return p1 + p2
-}
-
 type cells map[point]rune
 
 var directions = []point{
@@ -142,15 +126,6 @@ const (
 	droid   = 'D'
 )
 
-// input values
-const (
-	north = 1
-	south = 2
-	west  = 3
-	east  = 4
-)
-
-// output values
 const (
 	stuck = 0
 	moved = 1
@@ -195,7 +170,7 @@ func day15(ctx context.Context, input []int) {
 		trail                  []point
 		quit                   bool
 		toSend                 int
-		refreshRate            = time.Second / 1000
+		refreshRate            = time.Second / 200
 		refresh                = time.NewTimer(refreshRate)
 		oxygenSystem, origin   point
 		distanceToOxygenSystem int
@@ -207,7 +182,7 @@ func day15(ctx context.Context, input []int) {
 		}
 		var backtracking bool
 		q, toSend = g.cells.next(p)
-		if toSend == -1 {
+		if toSend == NoDirection {
 			backtracking = true
 			g.msg = fmt.Sprintf("At %v, no place to go! trail: %v", p, trail)
 			if len(trail) < 0 {
