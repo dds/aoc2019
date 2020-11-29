@@ -15,7 +15,7 @@ import (
 var Input = lib.InputInts(inputs.Day15(), lib.CSVParser)[0]
 
 func main() {
-	ctx, cancel := context.WithDeadline(lib.ContextWithSignals(context.Background()), time.Now().Add(10*time.Second))
+	ctx, cancel := context.WithDeadline(lib.ContextWithSignals(context.Background()), time.Now().Add(120*time.Second))
 	defer cancel()
 	fmt.Println(part1(ctx, Input))
 	fmt.Println(part2(ctx, Input))
@@ -25,9 +25,9 @@ type point struct {
 	x, y int
 }
 
-func (p point) add(q point) point {
-	p.x = p.x + q.x
-	p.y = p.y + q.y
+func (p point) add(x, y int) point {
+	p.x += x
+	p.y += y
 	return p
 }
 
@@ -49,10 +49,53 @@ func (p point) distance(q point) int {
 
 type cells map[point]rune
 
+var directions = []point{
+	point{0, 1},
+	point{0, -1},
+	point{-1, 0},
+	point{1, 0},
+}
+
+const NoDirection = -1
+
+func direction(p, q point) int {
+	d := q.add(-p.x, -p.y)
+	if d.x != 0 {
+		d.x = lib.Sign(d.x)
+	}
+	if d.y != 0 {
+		d.y = lib.Sign(d.y)
+	}
+	for i, v := range directions {
+		if v == d {
+			return i + 1
+		}
+	}
+	return NoDirection
+}
+
+func (p point) neighbors() (r []point) {
+	for _, q := range directions {
+		r = append(r, p.add(q.x, q.y))
+	}
+	return
+}
+
+func (c cells) next(p point) (point, int) {
+	// Find the first unexplored direction.
+	for i, q := range p.neighbors() {
+		if _, ok := c[q]; !ok {
+			return q, i + 1
+		}
+	}
+	return point{}, NoDirection
+}
+
 type grid struct {
 	tcell.Screen
 	cells
 	scene int
+	msg   string
 }
 
 func (g *grid) init() {
@@ -75,12 +118,22 @@ func (g *grid) draw() {
 	origin := point{x: w / 2, y: h / 2}
 	g.Clear()
 	for p, shape := range g.cells {
-		p = origin.add(p)
+		p = origin.add(p.x, -p.y)
 		g.SetContent(p.x, p.y, shape, nil, tcell.StyleDefault)
 	}
 	g.scene++
 	for i, c := range fmt.Sprintf("Scene: %v", g.scene) {
 		g.SetContent(i, 0, c, nil, tcell.StyleDefault)
+	}
+	var i, line int = 0, 1
+	for _, ch := range g.msg {
+		if ch == '\n' {
+			line++
+			i = 0
+			continue
+		}
+		g.SetContent(i, line, ch, nil, tcell.StyleDefault)
+		i++
 	}
 	g.Show()
 }
@@ -113,27 +166,15 @@ func part1(ctx context.Context, input []int) (rc int) {
 	errs := make(chan error)
 	go func() {
 		if err := intcode.Code(input).Exec(ctx, in, out); err != nil {
-			select {
-			case <-ctx.Done():
-				return
-			case errs <- err:
-			}
-		}
-	}()
-
-	g := &grid{}
-	g.init()
-	g.draw()
-
-	defer func() {
-		g.Fini()
-		fmt.Println("... and we're back")
-		if err := recover(); err != nil {
-			panic(err)
+			errs <- err
 		}
 	}()
 
 	userQuit := make(chan struct{})
+
+	g := &grid{cells: make(cells)}
+	g.init()
+	g.draw()
 	go func() {
 		for {
 			switch ev := g.PollEvent().(type) {
@@ -146,23 +187,49 @@ func part1(ctx context.Context, input []int) (rc int) {
 			}
 		}
 	}()
+	defer func() {
+		g.Fini()
+		fmt.Println("... and we're back")
+		if err := recover(); err != nil {
+			panic(err)
+		}
+	}()
 
 	var (
-		p      point
-		quit   bool
-		toSend int
+		p, q        point
+		w, h        int
+		trail       []point
+		quit        bool
+		toSend      int
+		refreshRate = time.Second / 1000
+		refresh     = time.NewTimer(refreshRate)
 	)
 
-	const noInput = -1
-
+	g.cells[p] = 'O'
+	var oxygenSystem point
 	for !quit {
-		var inputC chan int
-		toSend = east
-		if toSend != noInput {
-			inputC = in
+		var backtracking bool
+		q, toSend = g.cells.next(p)
+		if toSend == -1 {
+			backtracking = true
+			g.msg = fmt.Sprintf("At %v, no place to go! trail: %v", p, trail)
+			if len(trail) < 0 {
+				panic(fmt.Errorf("No trail. p %v, q %v", p, q))
+			}
+			q = trail[0]
+			toSend = direction(p, q)
+			g.msg += fmt.Sprintf("\nFinding direction: p %v, q %v, toSend %v", p, q, toSend)
+		} else {
+			g.msg = fmt.Sprintf("At %v, trying %v, trail: %v", p, q, trail)
 		}
 
-		q := p.add(point{1, 0})
+		select {
+		case <-ctx.Done():
+			panic(ctx.Err())
+		case err := <-errs:
+			panic(err)
+		case in <- toSend:
+		}
 
 		select {
 		case <-ctx.Done():
@@ -171,25 +238,135 @@ func part1(ctx context.Context, input []int) (rc int) {
 			quit = true
 		case err := <-errs:
 			panic(err)
-		case inputC <- toSend:
-			toSend = noInput
-		case c := <-out:
+		case c, ok := <-out:
+			if !ok {
+				quit = true
+			}
+			g.msg += fmt.Sprintf("\nReceived: %v, %v", c, ok)
 			switch c {
 			case goal:
 				g.cells[q] = destination
+				g.cells[p] = droid
 				quit = true
+				oxygenSystem = q
 			case moved:
-				g.cells[p] = visited
+				if !(p.x == 0 && p.y == 0) {
+					g.cells[p] = visited
+				}
+				g.cells[q] = droid
+				if !backtracking {
+					trail = append([]point{p}, trail...)
+				} else {
+					trail = trail[1:]
+				}
+				g.msg += fmt.Sprintf("\nUpdating point from %v => %v", p, q)
 				p = q
+				w = lib.Max(w, 2*lib.Sign(p.x)*p.x)
+				h = lib.Max(w, 2*lib.Sign(p.y)*p.y)
 			case stuck:
 				g.cells[q] = wall
 			}
 		}
-		//  - paint the screen
-		g.cells[p] = droid
+		<-refresh.C
+		refresh.Reset(refreshRate)
 		g.draw()
 	}
-	//  - a_star on the location
+	g.msg += fmt.Sprintf("\nOxygen system is at %v\nGrid is %vx%v. Press escape to quit.", oxygenSystem, w, h)
+	g.draw()
+	select {
+	case <-ctx.Done():
+	case <-userQuit:
+	case err := <-errs:
+		panic(err)
+	}
+	fmt.Printf("Found oxygen system at %v, finding optimal path...\n", oxygenSystem)
+	optimalPath, err := g.astar(point{0, 0}, oxygenSystem)
+	if err != nil {
+		panic(err)
+	}
+	refreshRate = time.Second / 2
+	for _, p := range optimalPath {
+		g.cells[p] = '+'
+		g.draw()
+		select {
+		case <-ctx.Done():
+		case <-userQuit:
+		case err := <-errs:
+			panic(err)
+		case <-refresh.C:
+			refresh.Reset(refreshRate)
+		}
+	}
+	select {
+	case <-ctx.Done():
+	case <-userQuit:
+	case err := <-errs:
+		panic(err)
+	case <-refresh.C:
+		refresh.Reset(refreshRate)
+	}
+	fmt.Println(len(optimalPath))
+	return
+}
+
+var ErrNoPath = fmt.Errorf("no path")
+
+func (m cells) astar(start point, goal point) (trail []point, err error) {
+	// type visit struct {
+	// 	parent point
+	// 	distanceFromStart
+	// }
+	// visited := map[point]visit{} // map visited node to previous nodes
+
+	// pq := pq{&node{point: start}}
+	// heap.Init(&pq)
+	// p := start
+
+	// for pq.Len() > 0 {
+	// 	u := heap.Pop(&pq).(*node)
+	// 	visited[u.point] = visit{parent: p, distanceFromStart: visit[p].distanceFromStart + 1}
+	// 	p = u.point
+
+	// 	if u.point == goal {
+	// 		for {
+	// 			trail = append([]point{u.point}, trail...)
+	// 			if p, ok := visited[parent]; ok {
+	// 				u.point = p.parent
+	// 				continue
+	// 			}
+	// 			return
+	// 		}
+	// 	}
+
+	// 	// time.Sleep(time.Second / 2)
+	// 	for _, q := range u.point.neighbors() {
+	// 		if _, ok := visited[q]; ok {
+	// 			continue
+	// 		}
+	// 		movementCost := 1
+	// 		if c, ok := m[q]; c == wall {
+	// 			movementCost += 1 << 20
+	// 		} else if !ok {
+	// 			movementCost += 1 << 10
+	// 		}
+	// 		cost := len(trail) + movementCost
+	// 		in, pos := pq.Find(q)
+	// 		if in != nil && cost < in.cost {
+	// 			heap.Remove(&pq, pos) // alternative path is better
+	// 		}
+	// 		var seen bool
+	// 		_, seen = visited[q]
+	// 		// If we have passed this point, restore it if we found a better way to get there.
+	// 		if in != nil && seen && cost < in.cost {
+	// 			delete(visited, q)
+	// 		}
+	// 		if in == nil && !seen {
+	// 			in = &node{point: q, cost: cost + q.distance(goal)}
+	// 			heap.Push(&pq, in)
+	// 		}
+	// 	}
+	// }
+	// err = ErrNoPath
 	return
 }
 
@@ -206,10 +383,19 @@ type node struct {
 
 type pq []*node
 
+func (pq pq) Find(p point) (*node, int) {
+	for i, q := range pq {
+		if p == q.point {
+			return q, i
+		}
+	}
+	return nil, -1
+}
+
 func (pq pq) Len() int { return len(pq) }
 
 func (pq pq) Less(i, j int) bool {
-	return pq[i].cost > pq[j].cost
+	return pq[i].cost < pq[j].cost
 }
 
 func (pq pq) Swap(i, j int) {
@@ -218,10 +404,11 @@ func (pq pq) Swap(i, j int) {
 	pq[j].index = j
 }
 
-func (pq *pq) Push(n interface{}) {
-	node := n.(node)
-	node.index = len(*pq)
-	*pq = append(*pq, &node)
+func (pq *pq) Push(x interface{}) {
+	n := len(*pq)
+	node := x.(*node)
+	node.index = n
+	*pq = append(*pq, node)
 }
 
 func (pq *pq) Pop() interface{} {
@@ -229,7 +416,7 @@ func (pq *pq) Pop() interface{} {
 	n := len(old)
 	item := old[n-1]
 	*pq = old[0 : n-1]
-	return *item
+	return item
 }
 
 func (pq *pq) update(item *node, score int, priority int) {
