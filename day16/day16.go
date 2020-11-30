@@ -94,11 +94,11 @@ func part2(signal []int) (rc int) {
 	}
 
 	fmt.Println("Input len: ", len(input))
-	fmt.Println("Initial input: ", input)
-	fmt.Println("first coefficients: ", coefficients(len(input), 0))
-	fmt.Println("second coefficients: ", coefficients(len(input), 1))
+	fmt.Println("Initial input: ", input[:120])
+	fmt.Println("first coefficients: ", coefficients(len(input), 0)[:120])
+	fmt.Println("second coefficients: ", coefficients(len(input), 1)[:120])
 	phased := phase(input, 0)
-	fmt.Println("First phase:", phased)
+	fmt.Println("First phase:", phased[:120])
 
 	phased = phase(input, offset)
 	for i := 0; i < 999; i++ {
