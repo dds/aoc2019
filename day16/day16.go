@@ -38,14 +38,14 @@ func coefficients(n, row int) []int {
 	return r
 }
 
-func phase(input []int) (output []int) {
+func phase(input []int, offset int) (output []int) {
 	n := len(input)
 	output = make([]int, n)
 	for i := 0; i < n; i++ {
 		coef := coefficients(n, i)
 		var c int
 		for j := 0; j < len(coef); j++ {
-			c += input[j] * coef[j]
+			c += input[offset+j] * coef[offset+j]
 		}
 		if c < 0 {
 			c = -c
@@ -60,11 +60,11 @@ func part1(input []int) (rc int) {
 	fmt.Println("Initial input: ", input)
 	fmt.Println("first coefficients: ", coefficients(len(input), 0))
 	fmt.Println("second coefficients: ", coefficients(len(input), 1))
-	phased := phase(input)
+	phased := phase(input, 0)
 	fmt.Println("First phase:", phased)
 
 	for i := 0; i < 99; i++ {
-		phased = phase(phased)
+		phased = phase(phased, 0)
 	}
 	var join string
 	for _, i := range phased {
@@ -77,19 +77,53 @@ func part1(input []int) (rc int) {
 	return a
 }
 
-func part2(input []int) (rc int) {
-	signal := phase(input)
-	for i := 0; i < 999; i++ {
-		signal = phase(signal)
+func part2(signal []int) (rc int) {
+	n := len(signal)
+	input := make([]int, 10000*n)
+	for i := 0; i < 10000; i++ {
+		copy(input[n*i:n*(i+1)], signal)
 	}
 
+	var s string
+	for i := 0; i < 7; i++ {
+		s += fmt.Sprint(signal[i])
+	}
+	offset, err := strconv.Atoi(s)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println("Input len: ", len(input))
+	fmt.Println("Initial input: ", input)
+	fmt.Println("first coefficients: ", coefficients(len(input), 0))
+	fmt.Println("second coefficients: ", coefficients(len(input), 1))
+	phased := phase(input, 0)
+	fmt.Println("First phase:", phased)
+
+	for i := 0; i < 99; i++ {
+		phased = phase(phased, 0)
+	}
 	var join string
-	for _, i := range signal {
+	for _, i := range phased {
 		join += fmt.Sprint(i)
 	}
 	a, err := strconv.Atoi(join[:8])
 	if err != nil {
 		panic(err)
 	}
-	return a
+
+	phased = phase(input, offset)
+	for i := 0; i < 999; i++ {
+		phased = phase(input, offset)
+	}
+
+	s = ""
+	for i := 0; i < 8; i++ {
+		s += fmt.Sprint(phased[offset+i])
+	}
+	rc, err = strconv.Atoi(s)
+	if err != nil {
+		panic(err)
+	}
+	return
 }
