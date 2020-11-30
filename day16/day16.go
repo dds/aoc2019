@@ -100,18 +100,6 @@ func part2(signal []int) (rc int) {
 	phased := phase(input, 0)
 	fmt.Println("First phase:", phased)
 
-	for i := 0; i < 99; i++ {
-		phased = phase(phased, 0)
-	}
-	var join string
-	for _, i := range phased {
-		join += fmt.Sprint(i)
-	}
-	a, err := strconv.Atoi(join[:8])
-	if err != nil {
-		panic(err)
-	}
-
 	phased = phase(input, offset)
 	for i := 0; i < 999; i++ {
 		phased = phase(input, offset)
