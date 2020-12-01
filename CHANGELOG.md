@@ -1,3 +1,19 @@
+# [1.7.0](https://github.com/dds/aoc2019/compare/v1.6.0...v1.7.0) (2020-12-01)
+
+
+### Bug Fixes
+
+* copy pasta ([6556399](https://github.com/dds/aoc2019/commit/6556399c176c77ddff23a0c6af80be2a4263e0ca))
+* day16: limit printing to first 120 ([2107e55](https://github.com/dds/aoc2019/commit/2107e55786477160a3b7b61143da709b55a5a63a))
+* update tests ([7d586be](https://github.com/dds/aoc2019/commit/7d586be37548128bfe6e3abe98732e424b4db524))
+
+
+### Features
+
+* day16 part2 partial implementation and tests ([c1e5e71](https://github.com/dds/aoc2019/commit/c1e5e71b86e438c653889eaea127f9032946268f))
+
+
+
 # [1.6.0](https://github.com/dds/aoc2019/compare/v1.5.0...v1.6.0) (2020-11-30)
 
 
@@ -31,20 +47,6 @@
 ### Features
 
 * day15 p1 and p2 ([8312040](https://github.com/dds/aoc2019/commit/831204072b35ba5a9511360416877f9a3568bf94))
-
-
-
-# [1.3.0](https://github.com/dds/aoc2019/compare/v1.2.0...v1.3.0) (2020-11-27)
-
-
-### Bug Fixes
-
-* day14 p1 test ([14eac97](https://github.com/dds/aoc2019/commit/14eac975aa68dde46a27d16ee37e1fe63577c969))
-
-
-### Features
-
-* day15 scaffold ([1e52e23](https://github.com/dds/aoc2019/commit/1e52e230728752c6891b1180a27cdaee4b50dc60))
 
 
 
