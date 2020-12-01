@@ -24,8 +24,27 @@ func main() {
 
 var base = []int{0, 1, 0, -1}
 
-func coefficients(n, row int) []int {
-	r := make([]int, n+1)
+type coefficients []int
+
+func (c coefficients) String() (s string) {
+	s = "["
+	for _, i := range c {
+		switch i {
+		case 0:
+			s += "0"
+		case 1:
+			s += "1"
+		case -1:
+			s += "!"
+		}
+		s += " "
+	}
+	s = s[:len(s)-1] + "]"
+	return
+}
+
+func mkcoefficients(n, row int) coefficients {
+	r := make(coefficients, n+1)
 	var i, digit int
 	for i < n+1 {
 		for j := 0; j < row+1 && i+j < n+1; j++ {
@@ -42,7 +61,7 @@ func phase(input []int, offset int) (output []int) {
 	n := len(input)
 	output = make([]int, n)
 	for i := 0; i < n; i++ {
-		coef := coefficients(n, i)
+		coef := mkcoefficients(n, i)
 		var c int
 		for j := 0; j < len(coef); j++ {
 			c += input[offset+j] * coef[offset+j]
@@ -55,17 +74,32 @@ func phase(input []int, offset int) (output []int) {
 	return
 }
 
-func part1(input []int) (rc int) {
-	fmt.Println("Input len: ", len(input))
-	fmt.Println("Initial input: ", input)
-	fmt.Println("first coefficients: ", coefficients(len(input), 0))
-	fmt.Println("second coefficients: ", coefficients(len(input), 1))
-	phased := phase(input, 0)
-	fmt.Println("First phase:", phased)
+func phase2ndhalfonly(input []int, offset int) (output []int) {
+	n := len(input)
+	output = make([]int, n)
+	output[n-1] = input[n-1]
+	for i := n - 2; i > -1; i-- {
+		output[i] = output[i+1] + input[i]
+		output[i] %= 10
+	}
+	return
+}
 
+func part1(input []int) (rc int) {
+	n := len(input)
+	m := lib.Min(n, 32)
+	fmt.Println("N: ", n)
+	fmt.Println("    input:", input[:m])
+	for i := 0; i < lib.Min(n, 32); i++ {
+		fmt.Printf("%02vth mult: %v\n", i+1, mkcoefficients(n, i)[:m])
+	}
+	phased := phase(input, 0)
 	for i := 0; i < 99; i++ {
+		fmt.Printf("%02vth phse: %v\n", i+1, phased[:m])
 		phased = phase(phased, 0)
 	}
+
+	fmt.Println("Nth phase:", phased[:m])
 	var join string
 	for _, i := range phased {
 		join += fmt.Sprint(i)
@@ -93,16 +127,9 @@ func part2(signal []int) (rc int) {
 		panic(err)
 	}
 
-	fmt.Println("Input len: ", len(input))
-	fmt.Println("Initial input: ", input[:120])
-	fmt.Println("first coefficients: ", coefficients(len(input), 0)[:120])
-	fmt.Println("second coefficients: ", coefficients(len(input), 1)[:120])
-	phased := phase(input, 0)
-	fmt.Println("First phase:", phased[:120])
-
-	phased = phase(input, offset)
-	for i := 0; i < 999; i++ {
-		phased = phase(input, offset)
+	phased := phase2ndhalfonly(input, 0)
+	for i := 0; i < 99; i++ {
+		phased = phase2ndhalfonly(phased, 0)
 	}
 
 	s = ""
