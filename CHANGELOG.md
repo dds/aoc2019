@@ -1,3 +1,7 @@
+## [1.8.3](https://github.com/dds/aoc2019/compare/v1.8.2...v1.8.3) (2020-12-02)
+
+
+
 ## [1.8.2](https://github.com/dds/aoc2019/compare/v1.8.1...v1.8.2) (2020-12-02)
 
 
@@ -28,15 +32,6 @@
 ### Features
 
 * day16 part2 partial implementation and tests ([c1e5e71](https://github.com/dds/aoc2019/commit/c1e5e71b86e438c653889eaea127f9032946268f))
-
-
-
-# [1.6.0](https://github.com/dds/aoc2019/compare/v1.5.0...v1.6.0) (2020-11-30)
-
-
-### Features
-
-* day16 part1 ([d9bb31f](https://github.com/dds/aoc2019/commit/d9bb31f5e544bef9acf7d65a0114521fa99c26e8))
 
 
 
