@@ -14,12 +14,15 @@ import (
 var Input = lib.InputInts(inputs.Day17(), lib.NumberParser)[0]
 
 func main() {
-	ctx, cancel := context.WithDeadline(lib.ContextWithSignals(context.Background()), time.Now().Add(120*time.Second))
+	ctx, cancel := context.WithDeadline(lib.ContextWithSignals(context.Background()), time.Now().Add(30*time.Second))
 	defer cancel()
-	part1(ctx, Input)
+	fmt.Println(part1(ctx, Input))
+	fmt.Println(part2(ctx, Input))
 }
 
-func run(ctx context.Context, code intcode.Code, in, out chan int) {
+func part1(ctx context.Context, input []int) (rc int) {
+	in, out := make(chan int), make(chan int)
+	code := intcode.Code(input)
 	errs := make(chan error)
 	go func() {
 		if err := code.Exec(ctx, in, out); err != nil {
@@ -28,7 +31,6 @@ func run(ctx context.Context, code intcode.Code, in, out chan int) {
 	}()
 
 	userQuit := make(chan struct{})
-
 	g := &grid{cells: make(cells)}
 	g.init()
 	g.draw()
@@ -50,19 +52,98 @@ func run(ctx context.Context, code intcode.Code, in, out chan int) {
 			panic(err)
 		}
 	}()
-}
 
-func part1(ctx context.Context, input []int) (rc int) {
-	in, out := make(chan int), make(chan int)
-	code := intcode.Code(input)
-	run(ctx, code, in, out)
+	w, h := 0, 0
+	x, y := 0, 0
 	for c := range out {
-		fmt.Printf(string(rune(c)))
+		switch c := rune(c); c {
+		case '\n':
+			x = 0
+			y++
+		default:
+			g.cells[point{x, y}] = c
+			x++
+		}
+		w, h = lib.Max(w, x), lib.Max(h, y)
 	}
+cells:
+	for p, _ := range g.cells {
+		count := 0
+		for _, neighbor := range p.neighbors() {
+			if g.cells[p] != '#' || g.cells[neighbor] != '#' {
+				continue cells
+			}
+			count++
+		}
+		if count < 4 {
+			continue cells
+		}
+		g.cells[p] = 'O'
+		rc += p.x * p.y
+	}
+	g.draw()
+	select {
+	case <-ctx.Done():
+		panic(ctx.Err())
+	case <-userQuit:
+	}
+	g.Fini()
+	fmt.Println("WxH: ", w, "x", h)
 	return
 }
 
-func part2(input [][]int) (rc int) {
+func part2(ctx context.Context, input []int) (rc int) {
+	in, out := make(chan int), make(chan int)
+	code := intcode.Code(input)
+	code[0] = 2
+	errs := make(chan error)
+	go func() {
+		if err := code.Exec(ctx, in, out); err != nil {
+			errs <- err
+		}
+	}()
+
+	go func() {
+		for {
+			for _, c := range fmt.Sprintf("A,A,B,C,B,C,B,C\n10,L,8,R,6\n") {
+				select {
+				case <-ctx.Done():
+				case in <- int(c):
+				}
+			}
+		}
+	}()
+	userQuit := make(chan struct{})
+	g := &grid{cells: make(cells)}
+	g.init()
+	g.draw()
+	go func() {
+		for {
+			switch ev := g.PollEvent().(type) {
+			case *tcell.EventResize:
+				g.Sync()
+			case *tcell.EventKey:
+				if ev.Key() == tcell.KeyEscape {
+					userQuit <- struct{}{}
+				}
+			}
+		}
+	}()
+	defer func() {
+		g.Fini()
+		if err := recover(); err != nil {
+			panic(err)
+		}
+	}()
+
+	g.draw()
+	select {
+	case <-ctx.Done():
+		panic(ctx.Err())
+	case <-userQuit:
+	}
+	g.Fini()
+	return
 	return
 }
 
@@ -143,12 +224,9 @@ func (g *grid) init() {
 }
 
 func (g *grid) draw() {
-	w, h := g.Size()
-	origin := point{x: w / 2, y: h / 2}
 	g.Clear()
 	for p, shape := range g.cells {
-		p = origin.add(p.x, -p.y)
-		g.SetContent(p.x, p.y, shape, nil, tcell.StyleDefault)
+		g.SetContent(p.x, p.y+4, shape, nil, tcell.StyleDefault)
 	}
 	g.scene++
 	for i, c := range fmt.Sprintf("Scene: %v", g.scene) {
