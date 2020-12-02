@@ -1,3 +1,7 @@
+## [1.8.2](https://github.com/dds/aoc2019/compare/v1.8.1...v1.8.2) (2020-12-02)
+
+
+
 ## [1.8.1](https://github.com/dds/aoc2019/compare/v1.8.0...v1.8.1) (2020-12-01)
 
 
@@ -33,15 +37,6 @@
 ### Features
 
 * day16 part1 ([d9bb31f](https://github.com/dds/aoc2019/commit/d9bb31f5e544bef9acf7d65a0114521fa99c26e8))
-
-
-
-# [1.5.0](https://github.com/dds/aoc2019/compare/v1.4.1...v1.5.0) (2020-11-29)
-
-
-### Features
-
-* day16 scaffold ([4146b6f](https://github.com/dds/aoc2019/commit/4146b6ff0c7f062b4208cbc79516bd1893549f70))
 
 
 
