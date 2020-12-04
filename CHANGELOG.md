@@ -1,3 +1,7 @@
+## [1.8.6](https://github.com/dds/aoc2019/compare/v1.8.5...v1.8.6) (2020-12-04)
+
+
+
 ## [1.8.5](https://github.com/dds/aoc2019/compare/v1.8.4...v1.8.5) (2020-12-04)
 
 
@@ -11,10 +15,6 @@
 
 
 ## [1.8.2](https://github.com/dds/aoc2019/compare/v1.8.1...v1.8.2) (2020-12-02)
-
-
-
-## [1.8.1](https://github.com/dds/aoc2019/compare/v1.8.0...v1.8.1) (2020-12-01)
 
 
 
