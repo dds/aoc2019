@@ -5,7 +5,7 @@ import (
 	"image"
 
 	"github.com/dds/aoc2019/lib"
-	"github.com/gdamore/tcell"
+	"github.com/gdamore/tcell/v2"
 )
 
 var directions = []image.Point{

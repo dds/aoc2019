@@ -8,7 +8,7 @@ import (
 	"github.com/dds/aoc2019/intcode"
 	"github.com/dds/aoc2019/lib"
 	"github.com/dds/aoc2019/lib/inputs"
-	"github.com/gdamore/tcell"
+	"github.com/gdamore/tcell/v2"
 )
 
 var Input = lib.InputInts(inputs.Day15(), lib.CSVParser)[0]

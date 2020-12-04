@@ -8,7 +8,7 @@ import (
 
 	"github.com/dds/aoc2019/intcode"
 	"github.com/dds/aoc2019/lib"
-	"github.com/gdamore/tcell"
+	"github.com/gdamore/tcell/v2"
 )
 
 var Input = lib.InputInts(lib.Inputs[13], lib.CSVParser)[0]
