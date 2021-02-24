@@ -1,3 +1,12 @@
+## [1.8.14](https://github.com/dds/aoc2019/compare/v1.8.13...v1.8.14) (2021-02-24)
+
+
+### Bug Fixes
+
+* **deps:** update module github.com/atotto/clipboard to v0.1.4 ([eb57cd3](https://github.com/dds/aoc2019/commit/eb57cd30ba04e123105b2ce56ec689e4d0642c32))
+
+
+
 ## [1.8.13](https://github.com/dds/aoc2019/compare/v1.8.12...v1.8.13) (2021-02-24)
 
 
@@ -21,10 +30,6 @@
 
 
 ## [1.8.10](https://github.com/dds/aoc2019/compare/v1.8.9...v1.8.10) (2021-02-11)
-
-
-
-## [1.8.9](https://github.com/dds/aoc2019/compare/v1.8.8...v1.8.9) (2021-01-22)
 
 
 
