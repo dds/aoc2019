@@ -1,3 +1,12 @@
+## [1.8.18](https://github.com/dds/aoc2019/compare/v1.8.17...v1.8.18) (2021-05-19)
+
+
+### Bug Fixes
+
+* **deps:** update module github.com/gdamore/tcell/v2 to v2.3.2 ([269762e](https://github.com/dds/aoc2019/commit/269762e5dce8a7afbf154e31eb734706e859ec78))
+
+
+
 ## [1.8.17](https://github.com/dds/aoc2019/compare/v1.8.16...v1.8.17) (2021-05-16)
 
 
@@ -31,15 +40,6 @@
 ### Bug Fixes
 
 * **deps:** update module github.com/atotto/clipboard to v0.1.4 ([eb57cd3](https://github.com/dds/aoc2019/commit/eb57cd30ba04e123105b2ce56ec689e4d0642c32))
-
-
-
-## [1.8.13](https://github.com/dds/aoc2019/compare/v1.8.12...v1.8.13) (2021-02-24)
-
-
-### Bug Fixes
-
-* **deps:** update module github.com/atotto/clipboard to v0.1.3 ([6656c6c](https://github.com/dds/aoc2019/commit/6656c6c66bce92c9040b6848ee8d822aef194e10))
 
 
 
