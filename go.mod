@@ -8,6 +8,6 @@ require (
 	github.com/gdamore/tcell/v2 v2.3.9
 	github.com/pkg/math v0.0.0-20141027224758-f2ed9e40e245
 	github.com/stretchr/testify v1.7.0
-	github.com/yourbasic/graph v0.0.0-20170921192928-40eb135c0b26
+	github.com/yourbasic/graph v0.0.0-20210606180040-8ecfec1c2869
 	gonum.org/v1/gonum v0.8.2
 )
