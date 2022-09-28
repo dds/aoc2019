@@ -1,6 +1,6 @@
 module github.com/dds/aoc2019
 
-go 1.15
+go 1.19
 
 require (
 	github.com/alecthomas/kong v0.6.1
@@ -10,4 +10,18 @@ require (
 	github.com/stretchr/testify v1.8.0
 	github.com/yourbasic/graph v0.0.0-20210606180040-8ecfec1c2869
 	gonum.org/v1/gonum v0.12.0
+)
+
+require (
+	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/gdamore/encoding v1.0.0 // indirect
+	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
+	github.com/mattn/go-runewidth v0.0.13 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/rivo/uniseg v0.2.0 // indirect
+	golang.org/x/exp v0.0.0-20191002040644-a1355ae1e2c3 // indirect
+	golang.org/x/sys v0.0.0-20220318055525-2edf467146b5 // indirect
+	golang.org/x/term v0.0.0-20201210144234-2321bbc49cbf // indirect
+	golang.org/x/text v0.3.7 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
