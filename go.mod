@@ -3,7 +3,7 @@ module github.com/dds/aoc2019
 go 1.19
 
 require (
-	github.com/alecthomas/kong v0.6.1
+	github.com/alecthomas/kong v0.7.0
 	github.com/atotto/clipboard v0.1.4
 	github.com/gdamore/tcell/v2 v2.5.3
 	github.com/pkg/math v0.0.0-20141027224758-f2ed9e40e245
