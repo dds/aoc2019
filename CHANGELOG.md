@@ -1,3 +1,12 @@
+## [1.8.44](https://github.com/dds/aoc2019/compare/v1.8.43...v1.8.44) (2022-10-25)
+
+
+### Bug Fixes
+
+* **deps:** update module github.com/alecthomas/kong to v0.7.0 ([f74fd73](https://github.com/dds/aoc2019/commit/f74fd7333672a3cdf01517a453f471bba07bc504))
+
+
+
 ## [1.8.43](https://github.com/dds/aoc2019/compare/v1.8.42...v1.8.43) (2022-10-24)
 
 
@@ -26,15 +35,6 @@
 ### Bug Fixes
 
 * **deps:** update module github.com/gdamore/tcell/v2 to v2.5.3 ([7e2d86a](https://github.com/dds/aoc2019/commit/7e2d86a6dc09370558607e407aeddbfd6e7783eb))
-
-
-
-## [1.8.39](https://github.com/dds/aoc2019/compare/v1.8.38...v1.8.39) (2022-07-30)
-
-
-### Bug Fixes
-
-* **deps:** update module github.com/gdamore/tcell/v2 to v2.5.2 ([1b9686a](https://github.com/dds/aoc2019/commit/1b9686ae8ede2878e77faced0f3b111c06386cf1))
 
 
 
