@@ -1,3 +1,12 @@
+## [1.8.50](https://github.com/dds/aoc2019/compare/v1.8.49...v1.8.50) (2023-05-28)
+
+
+### Bug Fixes
+
+* **deps:** update module gonum.org/v1/gonum to v0.13.0 ([80d5c21](https://github.com/dds/aoc2019/commit/80d5c210c52d7f856bb8701878e036e4fa9ca88a))
+
+
+
 ## [1.8.49](https://github.com/dds/aoc2019/compare/v1.8.48...v1.8.49) (2023-05-28)
 
 
@@ -31,15 +40,6 @@
 ### Bug Fixes
 
 * **deps:** update module github.com/gdamore/tcell/v2 to v2.5.4 ([adc3690](https://github.com/dds/aoc2019/commit/adc3690c4841b96eedbce58ae68d5839a0de85fb))
-
-
-
-## [1.8.45](https://github.com/dds/aoc2019/compare/v1.8.44...v1.8.45) (2022-11-13)
-
-
-### Bug Fixes
-
-* **deps:** update module github.com/alecthomas/kong to v0.7.1 ([b4f2aef](https://github.com/dds/aoc2019/commit/b4f2aef78102a819f6cc1eebaf4f07ed75dad305))
 
 
 
