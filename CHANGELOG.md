@@ -1,3 +1,12 @@
+## [1.8.49](https://github.com/dds/aoc2019/compare/v1.8.48...v1.8.49) (2023-05-28)
+
+
+### Bug Fixes
+
+* **deps:** update module github.com/stretchr/testify to v1.8.3 ([6760974](https://github.com/dds/aoc2019/commit/676097457bc995e5f2eaf27fce7074fb37d7fc6a))
+
+
+
 ## [1.8.48](https://github.com/dds/aoc2019/compare/v1.8.47...v1.8.48) (2023-02-25)
 
 
@@ -31,15 +40,6 @@
 ### Bug Fixes
 
 * **deps:** update module github.com/alecthomas/kong to v0.7.1 ([b4f2aef](https://github.com/dds/aoc2019/commit/b4f2aef78102a819f6cc1eebaf4f07ed75dad305))
-
-
-
-## [1.8.44](https://github.com/dds/aoc2019/compare/v1.8.43...v1.8.44) (2022-10-25)
-
-
-### Bug Fixes
-
-* **deps:** update module github.com/alecthomas/kong to v0.7.0 ([f74fd73](https://github.com/dds/aoc2019/commit/f74fd7333672a3cdf01517a453f471bba07bc504))
 
 
 
