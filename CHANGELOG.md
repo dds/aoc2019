@@ -1,3 +1,12 @@
+## [1.8.51](https://github.com/dds/aoc2019/compare/v1.8.50...v1.8.51) (2023-05-30)
+
+
+### Bug Fixes
+
+* **deps:** update module github.com/stretchr/testify to v1.8.4 ([687ebb1](https://github.com/dds/aoc2019/commit/687ebb1ff16aab12fd73d6b5536da71b28baf363))
+
+
+
 ## [1.8.50](https://github.com/dds/aoc2019/compare/v1.8.49...v1.8.50) (2023-05-28)
 
 
@@ -31,15 +40,6 @@
 ### Bug Fixes
 
 * **deps:** update module github.com/gdamore/tcell/v2 to v2.6.0 ([6db9d82](https://github.com/dds/aoc2019/commit/6db9d82a27831d3611bceccd16866cda7fe4a4ff))
-
-
-
-## [1.8.46](https://github.com/dds/aoc2019/compare/v1.8.45...v1.8.46) (2022-12-31)
-
-
-### Bug Fixes
-
-* **deps:** update module github.com/gdamore/tcell/v2 to v2.5.4 ([adc3690](https://github.com/dds/aoc2019/commit/adc3690c4841b96eedbce58ae68d5839a0de85fb))
 
 
 
