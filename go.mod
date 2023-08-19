@@ -9,7 +9,7 @@ require (
 	github.com/pkg/math v0.0.0-20141027224758-f2ed9e40e245
 	github.com/stretchr/testify v1.8.4
 	github.com/yourbasic/graph v0.0.0-20210606180040-8ecfec1c2869
-	gonum.org/v1/gonum v0.13.0
+	gonum.org/v1/gonum v0.14.0
 )
 
 require (
