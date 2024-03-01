@@ -1,3 +1,12 @@
+## [1.8.57](https://github.com/dds/aoc2019/compare/v1.8.56...v1.8.57) (2024-03-01)
+
+
+### Bug Fixes
+
+* **deps:** update module github.com/stretchr/testify to v1.9.0 ([7987a44](https://github.com/dds/aoc2019/commit/7987a44cddce3f8ecdbbb16dee01edf91ec59e8f))
+
+
+
 ## [1.8.56](https://github.com/dds/aoc2019/compare/v1.8.55...v1.8.56) (2024-02-18)
 
 
@@ -31,15 +40,6 @@
 ### Bug Fixes
 
 * **deps:** update module gonum.org/v1/gonum to v0.14.0 ([eef4902](https://github.com/dds/aoc2019/commit/eef4902cb1d47719e4b2c70ec418d5acf85b98e9))
-
-
-
-## [1.8.52](https://github.com/dds/aoc2019/compare/v1.8.51...v1.8.52) (2023-06-22)
-
-
-### Bug Fixes
-
-* **deps:** update module github.com/alecthomas/kong to v0.8.0 ([4858f7b](https://github.com/dds/aoc2019/commit/4858f7b0923dcfebe826f7379dca2ef2ba6c015a))
 
 
 
