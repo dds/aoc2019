@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/alecthomas/kong v0.8.1
 	github.com/atotto/clipboard v0.1.4
-	github.com/gdamore/tcell/v2 v2.7.2
+	github.com/gdamore/tcell/v2 v2.7.3
 	github.com/pkg/math v0.0.0-20141027224758-f2ed9e40e245
 	github.com/stretchr/testify v1.9.0
 	github.com/yourbasic/graph v0.0.0-20210606180040-8ecfec1c2869
