@@ -1,3 +1,12 @@
+## [1.8.62](https://github.com/dds/aoc2019/compare/v1.8.61...v1.8.62) (2024-03-16)
+
+
+### Bug Fixes
+
+* **deps:** update module gonum.org/v1/gonum to v0.15.0 ([9e6f73c](https://github.com/dds/aoc2019/commit/9e6f73ca868912bb0d3490504d482afdd01a0aad))
+
+
+
 ## [1.8.61](https://github.com/dds/aoc2019/compare/v1.8.60...v1.8.61) (2024-03-08)
 
 
@@ -31,15 +40,6 @@
 ### Bug Fixes
 
 * **deps:** update module github.com/gdamore/tcell/v2 to v2.7.2 ([fd5e50f](https://github.com/dds/aoc2019/commit/fd5e50ff410f08a7bf4a88471b0e6109fa322fd1))
-
-
-
-## [1.8.57](https://github.com/dds/aoc2019/compare/v1.8.56...v1.8.57) (2024-03-01)
-
-
-### Bug Fixes
-
-* **deps:** update module github.com/stretchr/testify to v1.9.0 ([7987a44](https://github.com/dds/aoc2019/commit/7987a44cddce3f8ecdbbb16dee01edf91ec59e8f))
 
 
 
