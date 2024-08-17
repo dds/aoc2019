@@ -1,8 +1,8 @@
 module github.com/dds/aoc2019
 
-go 1.21
+go 1.22
 
-toolchain go1.22.6
+toolchain go1.23.0
 
 require (
 	github.com/alecthomas/kong v0.9.0
@@ -11,7 +11,7 @@ require (
 	github.com/pkg/math v0.0.0-20141027224758-f2ed9e40e245
 	github.com/stretchr/testify v1.9.0
 	github.com/yourbasic/graph v0.0.0-20210606180040-8ecfec1c2869
-	gonum.org/v1/gonum v0.15.0
+	gonum.org/v1/gonum v0.15.1
 )
 
 require (
