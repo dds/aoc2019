@@ -1,3 +1,7 @@
+## [1.8.82](https://github.com/dds/aoc2019/compare/v1.8.81...v1.8.82) (2025-06-07)
+
+
+
 ## [1.8.81](https://github.com/dds/aoc2019/compare/v1.8.80...v1.8.81) (2025-05-07)
 
 
@@ -16,10 +20,6 @@
 ### Bug Fixes
 
 * **deps:** update module gonum.org/v1/gonum to v0.16.0 ([#86](https://github.com/dds/aoc2019/issues/86)) ([476392c](https://github.com/dds/aoc2019/commit/476392cc3cd78e5f97f58ca50339a665112ab5e5))
-
-
-
-## [1.8.77](https://github.com/dds/aoc2019/compare/v1.8.76...v1.8.77) (2025-02-11)
 
 
 
