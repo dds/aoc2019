@@ -1,3 +1,12 @@
+## [1.8.87](https://github.com/dds/aoc2019/compare/v1.8.86...v1.8.87) (2025-08-27)
+
+
+### Bug Fixes
+
+* **deps:** update module github.com/stretchr/testify to v1.11.1 ([#96](https://github.com/dds/aoc2019/issues/96)) ([d2007ff](https://github.com/dds/aoc2019/commit/d2007ffeb32b254a0e8d9866984d9f0331ccc80c))
+
+
+
 ## [1.8.86](https://github.com/dds/aoc2019/compare/v1.8.85...v1.8.86) (2025-08-25)
 
 
@@ -21,10 +30,6 @@
 
 
 ## [1.8.83](https://github.com/dds/aoc2019/compare/v1.8.82...v1.8.83) (2025-07-08)
-
-
-
-## [1.8.82](https://github.com/dds/aoc2019/compare/v1.8.81...v1.8.82) (2025-06-07)
 
 
 
