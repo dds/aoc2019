@@ -7,7 +7,7 @@ toolchain go1.25.4
 require (
 	github.com/alecthomas/kong v0.9.0
 	github.com/atotto/clipboard v0.1.4
-	github.com/gdamore/tcell/v2 v2.12.0
+	github.com/gdamore/tcell/v2 v2.12.1
 	github.com/pkg/math v0.0.0-20141027224758-f2ed9e40e245
 	github.com/stretchr/testify v1.11.1
 	github.com/yourbasic/graph v0.0.0-20210606180040-8ecfec1c2869
